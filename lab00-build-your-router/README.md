@@ -164,11 +164,13 @@ Expected: both images present, vtysh version printed.
 
 ## Troubleshooting
 
-**Build fails with "platform" error:**
+**Build fails with a platform or architecture error:**
+`setup.sh` auto-detects your architecture (`uname -m`) and passes
+`--platform linux/amd64` on x86-64 hosts and `--platform linux/arm64`
+on Apple Silicon (M1/M2/M3). If you need to override:
 ```bash
 podman build --platform linux/amd64 -t frr:latest containerfiles/frr/
 ```
-Add `--platform linux/amd64` explicitly if running on Apple Silicon.
 
 **vtysh not found in image:**
 The image is distroless — `vtysh` is at `/usr/bin/vtysh`. Run:

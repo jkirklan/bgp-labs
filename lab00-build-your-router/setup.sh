@@ -6,9 +6,10 @@ REPO_ROOT="$(cd "${LAB_DIR}/../.." && pwd)"
 
 echo "=== Lab 00: Build Your Router ==="
 echo ""
-echo "Step 1: Building frr:latest from containerfiles/frr/ ..."
+ARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+echo "Step 1: Building frr:latest from containerfiles/frr/ (platform: linux/${ARCH}) ..."
 cd "${REPO_ROOT}"
-podman build --platform linux/amd64 -t frr:latest containerfiles/frr/
+podman build --platform "linux/${ARCH}" -t frr:latest containerfiles/frr/
 echo "frr:latest built successfully."
 echo ""
 echo "Step 2: Pulling debug container ..."
