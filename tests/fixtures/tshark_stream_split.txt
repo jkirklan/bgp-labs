@@ -1,0 +1,23 @@
+[
+{
+  "_source": {
+    "layers": {
+      "frame": {"frame.time_epoch": "1727285001.123"},
+      "ip": {"ip.src": "10.0.12.1", "ip.dst": "10.0.12.2"},
+      "tcp": {"tcp.dstport": "179"},
+      "bgp": {"bgp.type": "4"}
+    }
+  }
+}
+,
+{
+  "_source": {
+    "layers": {
+      "frame": {"frame.time_epoch": "1727285031.456"},
+      "ip": {"ip.src": "10.0.12.2", "ip.dst": "10.0.12.1"},
+      "tcp": {"tcp.dstport": "47231"},
+      "bgp": {"bgp.type": "4"}
+    }
+  }
+}
+]
