@@ -144,16 +144,8 @@ will not invent routes; it only announces what the router actually has.
 
 **Exercise 2: Configure lab03-router-b**
 
-Edit `configs/router-b.conf` — fill in the two TODO sections:
+Apply the config live — no restart needed, and you'll see topology-watch react in real time:
 
-```
- neighbor 10.0.12.1 remote-as 65001
- ...
-  neighbor 10.0.12.1 activate
-  network 192.168.2.0/24
-```
-
-Apply the config without restarting:
 ```bash
 podman exec -i lab03-router-b vtysh << 'EOF'
 configure terminal
@@ -167,6 +159,14 @@ end
 write memory
 EOF
 ```
+
+What each line does:
+
+| Line | Meaning |
+|------|---------|
+| `neighbor 10.0.12.1 remote-as 65001` | Peer with router-a (10.0.12.1) which is in AS65001 |
+| `neighbor 10.0.12.1 activate` | Enable the neighbor in the IPv4 unicast address family (required before routes are exchanged) |
+| `network 192.168.2.0/24` | Advertise router-b's internal prefix to its BGP peers |
 
 **Exercise 3: Watch the session come up**
 
