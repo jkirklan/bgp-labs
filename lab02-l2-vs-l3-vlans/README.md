@@ -80,7 +80,6 @@ graph LR
 ```
 
 Four containers start: lab02-host-a1, lab02-host-a2, lab02-host-b1, lab02-router-a.
-topology-watch opens at http://localhost:8302.
 
 Wait 5 seconds for FRR to initialize before running verification commands.
 
