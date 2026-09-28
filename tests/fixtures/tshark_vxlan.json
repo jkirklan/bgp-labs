@@ -1,0 +1,14 @@
+{
+  "_source": {
+    "layers": {
+      "frame": {"frame.time_epoch": "1727290001.000"},
+      "eth": {"eth.src": "02:42:0a:00:0c:01", "eth.dst": "02:42:0a:00:0c:02"},
+      "ip": {"ip.src": "10.0.12.1", "ip.dst": "10.0.12.2"},
+      "udp": {"udp.srcport": "12345", "udp.dstport": "4789"},
+      "vxlan": {"vxlan.vni": "1001"},
+      "eth_1": {"eth.src": "aa:bb:cc:dd:ee:01", "eth.dst": "aa:bb:cc:dd:ee:02"},
+      "ip_1": {"ip.src": "192.168.10.1", "ip.dst": "192.168.10.2", "ip.proto": "1"},
+      "icmp": {"icmp.type": "8"}
+    }
+  }
+}
