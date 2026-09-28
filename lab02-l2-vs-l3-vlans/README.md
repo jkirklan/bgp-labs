@@ -139,8 +139,24 @@ Expected: `!!!!!`. The packet now hops through lab02-router-a.
 podman run --rm -it --cap-add NET_RAW --network container:lab02-host-a1 \
   docker.io/nicolaka/netshoot bash
 # Inside: traceroute 192.168.20.10
-# Output: 192.168.10.254 (lab02-router-a) then 192.168.20.10 (lab02-host-b1)
 ```
+
+Expected output:
+```
+ 1  192.168.10.254  0.x ms   ← lab02-router-a's eth0 (its SVI on vlan10)
+ 2  192.168.20.10  0.x ms   ← lab02-host-b1, the destination
+```
+
+Reading the output:
+- **Hop 1 — `192.168.10.254`**: This is `lab02-router-a`'s address on vlan10 — the default
+  gateway for `host-a1`. Because `192.168.20.10` is on a different subnet, `host-a1`
+  forwards the packet to its gateway instead of trying to ARP for it directly.
+- **Hop 2 — `192.168.20.10`**: The router received the packet on eth0 (vlan10), looked up
+  the destination in its routing table, found `192.168.20.0/24` is directly connected on
+  eth1 (vlan20), and forwarded it. `host-b1` is the final destination.
+
+The container ID shown as the hostname (e.g. `0ed62b5bf7c7`) is normal — FRR uses the
+container ID as the hostname unless you configure one explicitly.
 
 **Part 3 — The split-subnet problem**
 
