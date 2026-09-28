@@ -178,7 +178,34 @@ then green (Established).
 podman exec -it lab03-router-a vtysh -c "show bgp summary"
 ```
 
-Expected: `Established` state, `1` prefix received.
+You'll see output like this:
+
+```
+IPv4 Unicast Summary (VRF default):
+BGP router identifier 10.0.12.1, local AS number 65001 vrf-id 0
+BGP table version 2
+RIB entries 3, using 576 bytes of memory
+Peers 1, using 29 KiB of memory
+
+Neighbor   V    AS  MsgRcvd  MsgSent  TblVer  InQ OutQ  Up/Down  State/PfxRcd  PfxSnt
+10.0.12.2  4  65002      6        6       2    0    0   00:01:23            1       1
+```
+
+Column by column:
+
+| Column | Meaning |
+|--------|---------|
+| `Neighbor` | The peer's IP address — router-b's address on the shared link |
+| `V` | BGP version — always 4 (BGP-4 is the only version in use today) |
+| `AS` | The peer's ASN — 65002 (router-b) |
+| `MsgRcvd / MsgSent` | Total BGP messages received and sent (OPENs + KEEPALIVEs + UPDATEs) |
+| `TblVer` | BGP table version — increments each time a route changes |
+| `InQ / OutQ` | Messages queued waiting to be processed/sent — should be 0 in steady state |
+| `Up/Down` | How long the session has been in its current state |
+| `State/PfxRcd` | If a number: session is **Established** and that many prefixes were received. If a word (Idle, Active…): session is not up — that's the FSM state |
+| `PfxSnt` | Prefixes sent to this peer |
+
+The `State/PfxRcd` column is the most important: `1` means Established and one prefix received — router-b's `192.168.2.0/24`.
 
 **Exercise 4: Verify route advertisement**
 
