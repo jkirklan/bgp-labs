@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${LAB_DIR}/../.." && pwd)"
 TOPO_PORT=8305
 
 echo "=== Lab 05: Many Paths ==="
@@ -17,7 +18,6 @@ podman network create lab05-as1-as2-link --subnet 10.0.12.0/30 2>/dev/null || tr
 podman network create lab05-as1-as3-link --subnet 10.0.13.0/30 2>/dev/null || true
 podman network create lab05-as2-as4-link --subnet 10.0.24.0/30 2>/dev/null || true
 podman network create lab05-as3-as4-link --subnet 10.0.34.0/30 2>/dev/null || true
-podman network create lab05-as1-internal --subnet 192.168.1.0/24 2>/dev/null || true
 
 echo "Step 2: Starting routers ..."
 
@@ -52,10 +52,15 @@ podman run -d --name lab05-router-d \
 echo "Routers started. Waiting 5s for FRR to initialize ..."
 sleep 5
 
-echo ""
-echo "Lab 05 is running."
-echo ""
-echo "Quick status:"
-podman exec lab05-router-a vtysh -c "show bgp summary" 2>/dev/null || echo "  router-a: bgpd not ready yet"
-echo ""
-echo "See README.md for exercises."
+cd "${REPO_ROOT}"
+python -c "
+from labs.tools.topology_watch.app import create_app
+create_app('${LAB_DIR}/lab.json').run(host='127.0.0.1', port=${TOPO_PORT})
+" &
+echo $! > "${LAB_DIR}/.topology-watch.pid"
+
+python -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
+echo $! > "${LAB_DIR}/.packet-watch.pid"
+
+echo "Lab 05 is up. topology-watch: http://localhost:${TOPO_PORT}"
+echo "router-d sessions will show red until configured."

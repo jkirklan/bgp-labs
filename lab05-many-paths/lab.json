@@ -10,7 +10,6 @@
     {"name": "lab05-as1-as2-link", "subnet": "10.0.12.0/30", "vni": null},
     {"name": "lab05-as1-as3-link", "subnet": "10.0.13.0/30", "vni": null},
     {"name": "lab05-as2-as4-link", "subnet": "10.0.24.0/30", "vni": null},
-    {"name": "lab05-as3-as4-link", "subnet": "10.0.34.0/30", "vni": null},
-    {"name": "lab05-as1-internal", "subnet": "192.168.1.0/24", "vni": null}
+    {"name": "lab05-as3-as4-link", "subnet": "10.0.34.0/30", "vni": null}
   ]
 }

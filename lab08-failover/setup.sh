@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${LAB_DIR}/../.." && pwd)"
 TOPO_PORT=8308
 
 echo "=== Lab 08: Failover ==="
@@ -40,10 +41,15 @@ podman run -d --name lab08-isp-backup \
 echo "Routers started. Waiting 5s for FRR to initialize ..."
 sleep 5
 
-echo ""
-echo "Lab 08 is running."
-echo ""
-echo "Quick status:"
-podman exec lab08-customer vtysh -c "show ip route 0.0.0.0/0" 2>/dev/null || echo "  customer: routing table not ready yet"
-echo ""
-echo "See README.md for exercises."
+cd "${REPO_ROOT}"
+python -c "
+from labs.tools.topology_watch.app import create_app
+create_app('${LAB_DIR}/lab.json').run(host='127.0.0.1', port=${TOPO_PORT})
+" &
+echo $! > "${LAB_DIR}/.topology-watch.pid"
+
+python -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
+echo $! > "${LAB_DIR}/.packet-watch.pid"
+
+echo "Lab 08 is up. topology-watch: http://localhost:${TOPO_PORT}"
+echo "Both sessions Established — primary link preferred (LOCAL_PREF=200)."

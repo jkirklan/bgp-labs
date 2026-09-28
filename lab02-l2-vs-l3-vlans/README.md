@@ -79,7 +79,7 @@ Expected: `!!!!!` — no router needed, they share the same Podman network.
 # Watch ARP in action with the debug container
 podman run --rm -it \
   --network container:lab02-host-a1 \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 # Inside: tcpdump -i eth0 arp
 # In another terminal: podman exec lab02-host-a1 vtysh -c "ping 192.168.10.11"
 # You'll see ARP request + reply — L2 resolution, no routing hop
@@ -118,7 +118,7 @@ Expected: `!!!!!`. The packet now hops through lab02-router-a.
 ```bash
 # Confirm the routing hop
 podman run --rm -it --network container:lab02-host-a1 \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 # Inside: traceroute 192.168.20.10
 # Output: 192.168.10.254 (lab02-router-a) then 192.168.20.10 (lab02-host-b1)
 ```
@@ -162,7 +162,7 @@ podman exec -it lab02-host-b1 vtysh -c "show ip route"
 **Debug container for ARP capture:**
 ```bash
 podman run --rm -it --network lab02-vlan10 \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 # Inside: tcpdump -i eth0 arp -n
 ```
 

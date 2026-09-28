@@ -50,11 +50,15 @@ podman run -d --name lab04-router-c \
 echo "Routers started. Waiting 5s for FRR to initialize ..."
 sleep 5
 
-echo ""
-echo "Lab 04 is running."
-echo "topology-watch: not started (run manually if needed)"
-echo ""
-echo "Quick status:"
-podman exec lab04-router-a vtysh -c "show bgp summary" 2>/dev/null || echo "  router-a: bgpd not ready yet"
-echo ""
-echo "See README.md for exercises."
+cd "${REPO_ROOT}"
+python -c "
+from labs.tools.topology_watch.app import create_app
+create_app('${LAB_DIR}/lab.json').run(host='127.0.0.1', port=${TOPO_PORT})
+" &
+echo $! > "${LAB_DIR}/.topology-watch.pid"
+
+python -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
+echo $! > "${LAB_DIR}/.packet-watch.pid"
+
+echo "Lab 04 is up. topology-watch: http://localhost:${TOPO_PORT}"
+echo "Sessions will show red (Idle) until router-b is configured."

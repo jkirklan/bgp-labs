@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${LAB_DIR}/../.." && pwd)"
 TOPO_PORT=8306
 
 echo "=== Lab 06: Route Filtering ==="
@@ -40,10 +41,15 @@ podman run -d --name lab06-router-c \
 echo "Routers started. Waiting 5s for FRR to initialize ..."
 sleep 5
 
-echo ""
-echo "Lab 06 is running."
-echo ""
-echo "Quick status:"
-podman exec lab06-router-b vtysh -c "show bgp summary" 2>/dev/null || echo "  router-b: bgpd not ready yet"
-echo ""
-echo "See README.md for exercises."
+cd "${REPO_ROOT}"
+python -c "
+from labs.tools.topology_watch.app import create_app
+create_app('${LAB_DIR}/lab.json').run(host='127.0.0.1', port=${TOPO_PORT})
+" &
+echo $! > "${LAB_DIR}/.topology-watch.pid"
+
+python -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
+echo $! > "${LAB_DIR}/.packet-watch.pid"
+
+echo "Lab 06 is up. topology-watch: http://localhost:${TOPO_PORT}"
+echo "All sessions start Established — begin exercises to observe filtering behavior."

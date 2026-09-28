@@ -140,7 +140,7 @@ podman exec -it lab03-router-a vtysh -c "show ip bgp 192.168.2.0/24"
 
 # TCP session on port 179
 podman run --rm -it --network container:lab03-router-a \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 # Inside: ss -tnp | grep 179
 ```
 

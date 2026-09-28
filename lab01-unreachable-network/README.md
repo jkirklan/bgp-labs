@@ -130,7 +130,7 @@ Check that both hosts have the return route. lab01-host-a → lab01-host-b works
 ```bash
 podman run --rm -it \
   --network container:lab01-host-a \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 # Inside: ip route, ping 10.2.0.10, ip neigh
 ```
 
