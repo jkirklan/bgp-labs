@@ -9,7 +9,7 @@
 
 ## Concepts
 
-**BGP** (Border Gateway Protocol) is the routing protocol that connects autonomous
+**[BGP](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)** (Border Gateway Protocol) is the routing protocol that connects autonomous
 systems on the internet. Each network operator runs their own AS (Autonomous System),
 identified by an ASN (Autonomous System Number).
 
