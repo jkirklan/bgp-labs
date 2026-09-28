@@ -70,7 +70,7 @@ Wait 5 seconds for FRR to initialize before running verification commands.
 **Part 1 — L2: same VLAN, no router needed**
 
 ```bash
-podman exec -it lab02-host-a1 vtysh -c "ping 192.168.10.11 count 5"
+podman exec lab02-host-a1 ping -c 5 192.168.10.11
 ```
 
 Expected: `!!!!!` — no router needed, they share the same Podman network.
@@ -81,14 +81,14 @@ podman run --rm -it \
   --network container:lab02-host-a1 \
   docker.io/nicolaka/netshoot bash
 # Inside: tcpdump -i eth0 arp
-# In another terminal: podman exec lab02-host-a1 vtysh -c "ping 192.168.10.11 count 5"
+# In another terminal: podman exec lab02-host-a1 ping -c 5 192.168.10.11
 # You'll see ARP request + reply — L2 resolution, no routing hop
 ```
 
 **Part 2 — L3: different VLANs, routing required**
 
 ```bash
-podman exec -it lab02-host-a1 vtysh -c "ping 192.168.20.10 count 5"
+podman exec lab02-host-a1 ping -c 5 192.168.20.10
 ```
 
 lab02-host-a1 has no route to 192.168.20.0/24. Add static routes:
@@ -110,7 +110,7 @@ EOF
 ```
 
 ```bash
-podman exec -it lab02-host-a1 vtysh -c "ping 192.168.20.10 count 5"
+podman exec lab02-host-a1 ping -c 5 192.168.20.10
 ```
 
 Expected: `!!!!!`. The packet now hops through lab02-router-a.
@@ -138,11 +138,11 @@ Imagine lab02-host-a1 and lab02-host-b1 were both configured with addresses in
 
 ```bash
 # Part 1: same-segment ping
-podman exec -it lab02-host-a1 vtysh -c "ping 192.168.10.11 count 5"
+podman exec lab02-host-a1 ping -c 5 192.168.10.11
 # Expected: 5/5 success, no routing hop
 
 # Part 2: cross-segment ping (after adding static routes)
-podman exec -it lab02-host-a1 vtysh -c "ping 192.168.20.10 count 5"
+podman exec lab02-host-a1 ping -c 5 192.168.20.10
 # Expected: 5/5 success
 
 # SVI interfaces on lab02-router-a

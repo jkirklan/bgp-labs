@@ -57,7 +57,7 @@ Wait 5 seconds for FRR to initialize before running verification commands.
 **Exercise 1: Confirm the failure**
 
 ```bash
-podman exec -it lab01-host-a vtysh -c "ping 10.2.0.10 count 5"
+podman exec lab01-host-a ping -c 5 10.2.0.10
 ```
 
 Expected: `Destination Host Unreachable` or no reply. lab01-host-a has no route to 10.2.0.0/24.
@@ -124,7 +124,7 @@ EOF
 **Exercise 3: Verify reachability**
 
 ```bash
-podman exec -it lab01-host-a vtysh -c "ping 10.2.0.10 count 5"
+podman exec lab01-host-a ping -c 5 10.2.0.10
 ```
 
 Expected: `!!!!!` (5 successful pings). Watch packet-watch show the ICMP traffic.
@@ -146,7 +146,7 @@ podman exec -it lab01-host-b vtysh -c "show ip route"
 # Should show: S 10.1.0.0/24 [1/0] via 10.2.0.254
 
 # Connectivity
-podman exec -it lab01-host-a vtysh -c "ping 10.2.0.10 count 5"
+podman exec lab01-host-a ping -c 5 10.2.0.10
 # Should show: 5/5 packets received
 ```
 
