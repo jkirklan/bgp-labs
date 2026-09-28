@@ -110,8 +110,37 @@ Wait 5 seconds for FRR to initialize before running verification commands.
 podman exec -it lab03-router-a vtysh -c "show running-config"
 ```
 
-Note the neighbor statement: `neighbor 10.0.12.2 remote-as 65002`
-Note the network advertisement: `network 192.168.1.0/24`
+You'll see output like this — here's what each line means:
+
+```
+frr version 8.5.3           ← FRR daemon version
+frr defaults traditional    ← use IOS-style defaults (not OpenBSD-style)
+hostname 56ea53edd6de       ← container ID used as hostname (no name configured)
+no ipv6 forwarding          ← disable IPv6 to keep the lab simple
+!
+interface eth0
+ ip address 10.0.12.1/30   ← eth0 is on the transit link to router-b; /30 = 4 IPs, 2 usable
+exit
+!
+interface eth1
+ ip address 192.168.1.1/24 ← eth1 is the internal network router-a is advertising
+exit
+!
+router bgp 65001            ← start BGP process; this router's ASN is 65001
+ bgp router-id 10.0.12.1   ← unique ID for this router in BGP (usually its IP)
+ no bgp ebgp-requires-policy ← FRR default blocks all routes without explicit policy;
+                               this disables that so routes flow freely in the lab
+ neighbor 10.0.12.2 remote-as 65002  ← peer with router-b (10.0.12.2) which is in AS65002
+ !
+ address-family ipv4 unicast         ← the following applies to IPv4 routes
+  network 192.168.1.0/24            ← advertise this prefix to BGP peers
+ exit-address-family
+exit
+```
+
+The `network` statement tells BGP to advertise `192.168.1.0/24` to its peers — but only
+if that prefix already exists in the routing table (as a connected route on eth1). BGP
+will not invent routes; it only announces what the router actually has.
 
 **Exercise 2: Configure lab03-router-b**
 
