@@ -160,14 +160,34 @@ container ID as the hostname unless you configure one explicitly.
 
 **Part 3 — The split-subnet problem**
 
-Imagine lab02-host-a1 and lab02-host-b1 were both configured with addresses in
-192.168.10.0/24 but connected to different Podman networks (different broadcast domains).
+Imagine two hosts that *should* share the same subnet (`192.168.10.0/24`) but are
+connected to different physical (or virtual) segments. ARP broadcasts don't cross
+segment boundaries, so they can never find each other — even though their addresses
+suggest they're neighbours.
 
-- lab02-host-a1 sends ARP "Who has 192.168.10.20?" — but the other host is on a
-  different network and never sees the broadcast. ARP fails. Ping fails.
-- Adding a router doesn't help: the router *routes* between different subnets, it
-  cannot bridge two separate segments of the *same* subnet without tunneling.
-- The fix: extend the L2 domain across the physical gap using VXLAN (Lab 09).
+You can observe this failure right now without reconfiguring anything. `host-b1` is
+on `lab02-vlan20` (`192.168.20.10`). Try to ping an address in `192.168.10.0/24`
+that doesn't exist on `vlan10`:
+
+```bash
+podman exec lab02-host-a1 ping -c 3 192.168.10.99
+```
+
+Expected: no reply. `host-a1` broadcasts an ARP request for `192.168.10.99` on
+`vlan10`. No host on `vlan10` has that address, so ARP gets no answer, and the ping
+fails immediately with `Destination Host Unreachable`.
+
+Now imagine `host-b1` *was* configured as `192.168.10.99` but on `vlan20`. The ARP
+broadcast from `host-a1` still never reaches it — it's on a different segment. The
+ping would fail for exactly the same reason, even though the addresses look like they
+belong together.
+
+Key takeaways:
+- Subnets are not just address ranges — they are **broadcast domains**. Hosts must
+  share the same broadcast domain to ARP for each other.
+- A router cannot fix this: routing is between subnets, not within one.
+- The only fix is to extend the L2 domain across the gap — which is what VXLAN does
+  (Lab 09).
 
 ## Verification
 
