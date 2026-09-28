@@ -27,31 +27,50 @@ hosts on the other. A router *routes* (it doesn't bridge at L2) — so adding a 
 doesn't solve this; routing within a subnet is a misconfiguration. The real solution
 is to extend the L2 domain across the physical gap using a tunnel — VXLAN (Lab 09).
 
+## Containers in This Lab
+
+Four containers run for the full duration. **lab02-host-a1 has a single interface (eth0)**
+connected to `lab02-vlan10`. It appears in both Part 1 and Part 2 because it is the same
+container reused across exercises — not two separate machines.
+
+| Container | Interface | IP | Network |
+|-----------|-----------|-----|---------|
+| lab02-host-a1 | eth0 | 192.168.10.10 | lab02-vlan10 |
+| lab02-host-a2 | eth0 | 192.168.10.11 | lab02-vlan10 |
+| lab02-host-b1 | eth0 | 192.168.20.10 | lab02-vlan20 |
+| lab02-router-a | eth0 | 192.168.10.254 | lab02-vlan10 |
+| lab02-router-a | eth1 | 192.168.20.254 | lab02-vlan20 |
+
+`lab02-router-a` is the only container with two interfaces. Its eth0 is the gateway for
+vlan10 hosts; its eth1 is the gateway for vlan20 hosts.
+
 ## Topology
 
+**Part 1 — L2: same broadcast domain, no router needed**
+
 ```
-PART 1 — L2: same broadcast domain (no router needed)
-[lab02-host-a1: 192.168.10.10]──┐
+lab02-host-a1 (192.168.10.10) ──┐
                                   ├── lab02-vlan10 (192.168.10.0/24)
-[lab02-host-a2: 192.168.10.11]──┘
-
-PART 2 — L3: different subnets (SVI router required)
-[lab02-host-a1: 192.168.10.10]──lab02-vlan10──[lab02-router-a]──lab02-vlan20──[lab02-host-b1: 192.168.20.10]
-                                               192.168.10.254  192.168.20.254
-
-PART 3 — Split-subnet problem (discussion)
-Two hosts that should be on 192.168.10.0/24 are on separate Podman networks.
-ARP cannot cross the boundary. VXLAN (Lab 09) is the solution.
+lab02-host-a2 (192.168.10.11) ──┘
 ```
+
+Both hosts share one Podman network. ARP resolves directly — no router involved.
+
+**Part 2 — L3: different subnets, router required**
+
+```
+lab02-host-a1 (192.168.10.10) ──┐
+                                  ├── lab02-vlan10 ──── lab02-router-a ──── lab02-vlan20 ──── lab02-host-b1 (192.168.20.10)
+lab02-host-a2 (192.168.10.11) ──┘     192.168.10.0/24   .254  .254    192.168.20.0/24
+```
+
+`host-a1` and `host-b1` are on different subnets. Traffic must hop through `router-a`.
 
 ```mermaid
 graph LR
-    subgraph "Part 1 — L2 (same segment)"
-        A1["lab02-host-a1<br>192.168.10.10"] --- V10["lab02-vlan10<br>192.168.10.0/24"] --- A2["lab02-host-a2<br>192.168.10.11"]
-    end
-    subgraph "Part 2 — L3 (routed)"
-        A1b["lab02-host-a1<br>192.168.10.10"] -->|vlan10| RA["lab02-router-a<br>.254/.254"] -->|vlan20| B1["lab02-host-b1<br>192.168.20.10"]
-    end
+    A1["lab02-host-a1<br>192.168.10.10/24<br>(eth0 only)"] <-->|"lab02-vlan10<br>192.168.10.0/24"| RA["lab02-router-a<br>eth0: 192.168.10.254<br>eth1: 192.168.20.254"]
+    A2["lab02-host-a2<br>192.168.10.11/24<br>(eth0 only)"] <-->|"lab02-vlan10"| RA
+    RA <-->|"lab02-vlan20<br>192.168.20.0/24"| B1["lab02-host-b1<br>192.168.20.10/24<br>(eth0 only)"]
 ```
 
 ## Setup
