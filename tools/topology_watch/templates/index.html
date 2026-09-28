@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BGP Topology</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <style>
+    body { margin: 0; background: #0f172a; font-family: monospace; color: #e2e8f0; }
+    #header { padding: 10px 20px; font-size: 13px; color: #94a3b8; border-bottom: 1px solid #1e293b; }
+    #graph { width: 100vw; height: calc(100vh - 38px); }
+    .node-label { font-size: 11px; fill: #cbd5e1; pointer-events: none; }
+    .link { stroke-width: 2.5; transition: stroke 0.4s; }
+    .tooltip { position: absolute; background: #1e293b; border: 1px solid #334155; padding: 8px 12px;
+               border-radius: 4px; font-size: 11px; pointer-events: none; display: none; white-space: pre; }
+  </style>
+</head>
+<body>
+<div id="header">Loading…</div>
+<svg id="graph"></svg>
+<div class="tooltip" id="tt"></div>
+<script>
+const COLORS = { Established:"#22c55e", Active:"#eab308", Connect:"#eab308",
+                 OpenSent:"#eab308", OpenConfirm:"#eab308" };
+const DEFAULT = "#ef4444";
+
+function edgeState(srcName, status) {
+  const peers = status[srcName] || {};
+  const states = Object.values(peers).map(p => p.state);
+  if (states.includes("Established")) return COLORS.Established;
+  if (states.some(s => COLORS[s])) return COLORS.Active;
+  return DEFAULT;
+}
+
+async function main() {
+  const topo = await fetch("/api/topology").then(r => r.json());
+  document.getElementById("header").textContent = `Lab: ${topo.lab}`;
+
+  const nodes = topo.routers.map(r => ({ id: r.name, asn: r.asn }));
+  const seenPairs = new Set();
+  const links = [];
+  topo.networks.forEach(net => {
+    for (let i = 0; i < nodes.length - 1; i++) {
+      const key = `${nodes[i].id}-${nodes[i+1].id}`;
+      if (!seenPairs.has(key)) {
+        seenPairs.add(key);
+        links.push({ id: net.name, source: nodes[i].id, target: nodes[i+1].id });
+        break;
+      }
+    }
+  });
+
+  const svg = d3.select("#graph");
+  const W = window.innerWidth, H = window.innerHeight - 38;
+
+  const sim = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d => d.id).distance(200))
+    .force("charge", d3.forceManyBody().strength(-500))
+    .force("center", d3.forceCenter(W/2, H/2));
+
+  const linkEls = svg.append("g").selectAll("line").data(links).join("line")
+    .attr("class", "link").attr("stroke", DEFAULT);
+
+  const nodeEls = svg.append("g").selectAll("circle").data(nodes).join("circle")
+    .attr("r", 22).attr("fill", "#1e293b").attr("stroke", "#475569").attr("stroke-width", 2)
+    .call(d3.drag()
+      .on("start", (e,d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+      .on("drag",  (e,d) => { d.fx=e.x; d.fy=e.y; })
+      .on("end",   (e,d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+    .on("mouseover", (e,d) => {
+      document.getElementById("tt").style.display = "block";
+      document.getElementById("tt").style.left = (e.pageX+12)+"px";
+      document.getElementById("tt").style.top  = (e.pageY-10)+"px";
+      document.getElementById("tt").textContent = `${d.id}\nAS${d.asn}`;
+    })
+    .on("mouseout", () => { document.getElementById("tt").style.display="none"; });
+
+  const labelEls = svg.append("g").selectAll("text").data(nodes).join("text")
+    .attr("class", "node-label").attr("text-anchor","middle").attr("dy", 36)
+    .text(d => `${d.id} (AS${d.asn})`);
+
+  sim.on("tick", () => {
+    linkEls.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y)
+           .attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+    nodeEls.attr("cx",d=>d.x).attr("cy",d=>d.y);
+    labelEls.attr("x",d=>d.x).attr("y",d=>d.y);
+  });
+
+  async function refresh() {
+    const status = await fetch("/api/status").then(r => r.json());
+    linkEls.attr("stroke", d => edgeState(
+      typeof d.source === "object" ? d.source.id : d.source, status));
+  }
+  refresh();
+  setInterval(refresh, 3000);
+}
+main();
+</script>
+</body>
+</html>
