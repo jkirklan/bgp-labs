@@ -10,8 +10,20 @@
 ## Concepts
 
 **[BGP](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)** (Border Gateway Protocol) is the routing protocol that connects autonomous
-systems on the internet. Each network operator runs their own AS (Autonomous System),
-identified by an ASN (Autonomous System Number).
+systems on the internet.
+
+An **AS (Autonomous System)** is a network under a single administrative control —
+one organization's routers, prefixes, and routing policy. Think of it as a country:
+it has its own internal rules, and BGP is the diplomacy between countries. Examples:
+
+- Your ISP's network is an AS
+- A cloud provider (AWS, Google) is an AS
+- A large university or enterprise with its own IP addresses is an AS
+
+Every AS is identified by an **ASN (Autonomous System Number)** — a globally unique
+number assigned by a regional internet registry (ARIN, RIPE, etc.). In these labs
+we use private ASNs in the 64512–65534 range (like 65001, 65002) — the same range
+you'd use in a lab or behind a private network, never on the public internet.
 
 BGP routers form **sessions** over TCP port 179. BGP is just a TCP application —
 the same way a browser sends HTTP over TCP port 80, a router sends BGP messages
