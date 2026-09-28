@@ -44,7 +44,7 @@ podman exec -it lab03-router-a vtysh
 # 2. Via --network container: — a NEW container shares the existing namespace
 podman run --rm -it \
   --network container:lab03-router-a \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 # Inside: you see the same eth0, same IPs, same routing table as lab03-router-a
 #         but you have a shell (vtysh doesn't give you one)
 ```
@@ -129,7 +129,7 @@ podman run -d --name test-router \
 # Join its network namespace with the debug container
 podman run --rm -it \
   --network container:test-router \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 
 # Inside the debug container:
 ip addr
@@ -147,7 +147,7 @@ podman rm -f test-router
 podman network create --subnet 10.99.0.0/24 test-net
 podman run --rm -it \
   --network test-net \
-  ghcr.io/container-images/debugging-tools bash
+  docker.io/nicolaka/netshoot bash
 # Inside: ip addr, ping 10.99.0.1, exit
 podman network rm test-net
 ```
@@ -157,7 +157,7 @@ podman network rm test-net
 ```bash
 podman image exists frr:latest && echo "OK: frr:latest present"
 podman run --rm frr:latest vtysh --version
-podman image exists ghcr.io/container-images/debugging-tools && echo "OK: debug image present"
+podman image exists docker.io/nicolaka/netshoot && echo "OK: debug image present"
 ```
 
 Expected: both images present, vtysh version printed.

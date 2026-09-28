@@ -1,0 +1,16 @@
+{
+  "lab": "lab05-many-paths",
+  "routers": [
+    {"name": "lab05-router-a", "asn": 65001, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab05-router-b", "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab05-router-c", "asn": 65003, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab05-router-d", "asn": 65004, "interfaces": ["eth0", "eth1"]}
+  ],
+  "networks": [
+    {"name": "lab05-as1-as2-link", "subnet": "10.0.12.0/30", "vni": null},
+    {"name": "lab05-as1-as3-link", "subnet": "10.0.13.0/30", "vni": null},
+    {"name": "lab05-as2-as4-link", "subnet": "10.0.24.0/30", "vni": null},
+    {"name": "lab05-as3-as4-link", "subnet": "10.0.34.0/30", "vni": null},
+    {"name": "lab05-as1-internal", "subnet": "192.168.1.0/24", "vni": null}
+  ]
+}
