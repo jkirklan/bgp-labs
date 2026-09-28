@@ -53,7 +53,13 @@ graph LR
     B  <-->|"10.0.23.0/30"| C["AS65003<br>lab04-router-c<br>192.168.3.0/24"]
 ```
 
-router-a is pre-configured. router-b and router-c have TODO gaps for you to fill in.
+**What's pre-configured vs. what you build:**
+
+- **router-a** — fully configured: BGP session to router-b, advertising `192.168.1.0/24`
+- **router-b** — partially configured: neighbor statements and `next-hop-self` are TODO comments for you to fill in via vtysh
+- **router-c** — partially configured: neighbor statement and network advertisement are TODO
+
+You will configure router-b and router-c live. The key challenge: without `next-hop-self` on router-b, router-c learns router-a's prefix but the next-hop IP (`10.0.12.1`) is unreachable from router-c's perspective — the route is invalid and traffic black-holes. Adding `next-hop-self` tells router-b to rewrite the next-hop to its own address so router-c can actually use the route.
 
 ## Setup
 
