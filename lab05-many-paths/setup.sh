@@ -53,13 +53,13 @@ echo "Routers started. Waiting 5s for FRR to initialize ..."
 sleep 5
 
 cd "${REPO_ROOT}"
-python -c "
+python3 -c "
 from labs.tools.topology_watch.app import create_app
 create_app('${LAB_DIR}/lab.json').run(host='127.0.0.1', port=${TOPO_PORT})
 " &
 echo $! > "${LAB_DIR}/.topology-watch.pid"
 
-python -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
+python3 -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
 echo $! > "${LAB_DIR}/.packet-watch.pid"
 
 echo "Lab 05 is up. topology-watch: http://localhost:${TOPO_PORT}"
