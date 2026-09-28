@@ -95,7 +95,7 @@ neighbor 10.0.23.2 remote-as 65003
 Apply without restarting:
 
 ```bash
-podman exec -it lab04-router-b vtysh << 'EOF'
+podman exec -i lab04-router-b vtysh << 'EOF'
 configure terminal
 router bgp 65002
  neighbor 10.0.12.1 remote-as 65001
@@ -125,7 +125,7 @@ neighbor 10.0.23.1 remote-as 65002
 Apply without restarting:
 
 ```bash
-podman exec -it lab04-router-c vtysh << 'EOF'
+podman exec -i lab04-router-c vtysh << 'EOF'
 configure terminal
 router bgp 65003
  neighbor 10.0.23.1 remote-as 65002
@@ -162,7 +162,7 @@ podman exec -it lab04-router-a vtysh -c "show ip bgp 192.168.3.0/24"
 **Exercise 6 (challenge): Remove next-hop-self and see what breaks**
 
 ```bash
-podman exec -it lab04-router-b vtysh << 'EOF'
+podman exec -i lab04-router-b vtysh << 'EOF'
 configure terminal
 router bgp 65002
  address-family ipv4 unicast

@@ -102,7 +102,7 @@ address-family ipv4 unicast
 Apply without restarting:
 
 ```bash
-podman exec -it lab07-transit vtysh << 'EOF'
+podman exec -i lab07-transit vtysh << 'EOF'
 configure terminal
 community-list standard CUSTOMER permit 65000:100
 community-list standard PEER permit 65000:200
@@ -166,7 +166,7 @@ Attach the well-known `no-export` community to routes received from the peer,
 preventing transit from re-advertising them to anyone:
 
 ```bash
-podman exec -it lab07-transit vtysh << 'EOF'
+podman exec -i lab07-transit vtysh << 'EOF'
 configure terminal
 route-map PEER-IN permit 10
  set community 65000:200 additive

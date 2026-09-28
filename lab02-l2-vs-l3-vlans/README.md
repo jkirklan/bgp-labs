@@ -94,14 +94,14 @@ podman exec -it lab02-host-a1 vtysh -c "ping 192.168.20.10 count 5"
 lab02-host-a1 has no route to 192.168.20.0/24. Add static routes:
 
 ```bash
-podman exec -it lab02-host-a1 vtysh << 'EOF'
+podman exec -i lab02-host-a1 vtysh << 'EOF'
 configure terminal
 ip route 192.168.20.0/24 192.168.10.254
 end
 write memory
 EOF
 
-podman exec -it lab02-host-b1 vtysh << 'EOF'
+podman exec -i lab02-host-b1 vtysh << 'EOF'
 configure terminal
 ip route 192.168.10.0/24 192.168.20.254
 end

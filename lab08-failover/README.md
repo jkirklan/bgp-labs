@@ -129,7 +129,7 @@ podman exec -it lab08-customer vtysh -c "show ip route 0.0.0.0/0"
 BGP can use BFD to detect failures in sub-second time:
 
 ```bash
-podman exec -it lab08-customer vtysh << 'EOF'
+podman exec -i lab08-customer vtysh << 'EOF'
 configure terminal
 router bgp 65001
  neighbor 10.0.12.2 bfd
@@ -138,7 +138,7 @@ end
 write memory
 EOF
 
-podman exec -it lab08-isp-primary vtysh << 'EOF'
+podman exec -i lab08-isp-primary vtysh << 'EOF'
 configure terminal
 router bgp 65002
  neighbor 10.0.12.1 bfd
@@ -159,7 +159,7 @@ Now repeat Exercise 3 — the failover should happen in 1-3 seconds instead of 9
 Set 3s keepalive / 9s hold on both sides of the primary link:
 
 ```bash
-podman exec -it lab08-customer vtysh << 'EOF'
+podman exec -i lab08-customer vtysh << 'EOF'
 configure terminal
 router bgp 65001
  neighbor 10.0.12.2 timers 3 9
@@ -167,7 +167,7 @@ end
 write memory
 EOF
 
-podman exec -it lab08-isp-primary vtysh << 'EOF'
+podman exec -i lab08-isp-primary vtysh << 'EOF'
 configure terminal
 router bgp 65002
  neighbor 10.0.12.1 timers 3 9

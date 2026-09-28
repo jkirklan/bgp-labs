@@ -87,7 +87,7 @@ Edit `configs/router-b.conf` — fill in the two TODO sections:
 
 Apply the config without restarting:
 ```bash
-podman exec -it lab03-router-b vtysh << 'EOF'
+podman exec -i lab03-router-b vtysh << 'EOF'
 configure terminal
 router bgp 65002
  neighbor 10.0.12.1 remote-as 65001
@@ -171,7 +171,7 @@ Wait 5 seconds after restart for FRR to reinitialize.
 **Enable BGP debug logging to diagnose session problems:**
 
 ```bash
-podman exec -it lab03-router-b vtysh << 'EOF'
+podman exec -i lab03-router-b vtysh << 'EOF'
 debug bgp neighbor-events
 debug bgp updates
 terminal monitor

@@ -87,7 +87,7 @@ neighbor 10.0.34.1 remote-as 65003
 Apply without restarting:
 
 ```bash
-podman exec -it lab05-router-d vtysh << 'EOF'
+podman exec -i lab05-router-d vtysh << 'EOF'
 configure terminal
 router bgp 65004
  neighbor 10.0.24.1 remote-as 65002
@@ -124,7 +124,7 @@ The path via router-b (NEXT_HOP=10.0.24.1) wins because router-b's router-id
 On router-b, prepend its own ASN once to make its path appear longer:
 
 ```bash
-podman exec -it lab05-router-b vtysh << 'EOF'
+podman exec -i lab05-router-b vtysh << 'EOF'
 configure terminal
 route-map PREPEND-OUT permit 10
  set as-path prepend 65002
@@ -150,7 +150,7 @@ podman exec -it lab05-router-d vtysh -c "show ip bgp 192.168.1.0/24"
 Set LOCAL_PREF=200 on router-d for routes received from router-b:
 
 ```bash
-podman exec -it lab05-router-d vtysh << 'EOF'
+podman exec -i lab05-router-d vtysh << 'EOF'
 configure terminal
 route-map SET-LOCALPREF permit 10
  set local-preference 200

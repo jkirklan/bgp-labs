@@ -103,7 +103,7 @@ place. Static routes fix this by being more specific than the default.
 
 On lab01-host-a, add a route for the 10.2.0.0/24 network via lab01-router-a:
 ```bash
-podman exec -it lab01-host-a vtysh << 'EOF'
+podman exec -i lab01-host-a vtysh << 'EOF'
 configure terminal
 ip route 10.2.0.0/24 10.1.0.254
 end
@@ -113,7 +113,7 @@ EOF
 
 On lab01-host-b, add a return route:
 ```bash
-podman exec -it lab01-host-b vtysh << 'EOF'
+podman exec -i lab01-host-b vtysh << 'EOF'
 configure terminal
 ip route 10.1.0.0/24 10.2.0.254
 end

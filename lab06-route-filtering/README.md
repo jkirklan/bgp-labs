@@ -104,7 +104,7 @@ address-family ipv4 unicast
 Apply without restarting:
 
 ```bash
-podman exec -it lab06-router-b vtysh << 'EOF'
+podman exec -i lab06-router-b vtysh << 'EOF'
 configure terminal
 ip prefix-list CUSTOMER-IN seq 10 permit 192.168.1.0/24
 ip prefix-list CUSTOMER-IN seq 20 permit 192.168.2.0/24
@@ -153,7 +153,7 @@ podman exec -it lab06-router-b vtysh -c "show ip prefix-list CUSTOMER-IN"
 Prevent router-b from advertising 10.0.0.0/8 to router-c even if it was accepted:
 
 ```bash
-podman exec -it lab06-router-b vtysh << 'EOF'
+podman exec -i lab06-router-b vtysh << 'EOF'
 configure terminal
 ip prefix-list BOGON-OUT seq 10 deny 10.0.0.0/8
 ip prefix-list BOGON-OUT seq 100 permit any
