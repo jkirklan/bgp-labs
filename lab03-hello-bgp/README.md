@@ -86,7 +86,7 @@ router-b: eth0=10.0.12.2/30, eth1=192.168.2.1/24
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab03-router-a<br>192.168.1.0/24"] -->|"10.0.12.0/30<br>lab03-as1-as2-link"| B["AS65002<br>lab03-router-b<br>192.168.2.0/24"]
+    A["AS65001<br>lab03-router-a<br>192.168.1.0/24"] <-->|"10.0.12.0/30<br>lab03-as1-as2-link"| B["AS65002<br>lab03-router-b<br>192.168.2.0/24"]
 ```
 
 lab03-router-a is pre-configured. lab03-router-b has TODO gaps for you to fill in.
