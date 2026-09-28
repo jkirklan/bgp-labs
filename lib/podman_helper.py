@@ -28,7 +28,12 @@ def get_bridge_iface(network_name: str) -> str:
         raise PodmanError(f"Podman network not found: {network_name}")
     try:
         data = json.loads(result.stdout)
-        return data[0]["plugins"][0]["bridge"]
+        net = data[0]
+        # netavark format (Podman 4.0+)
+        if "network_interface" in net:
+            return net["network_interface"]
+        # legacy CNI format
+        return net["plugins"][0]["bridge"]
     except (KeyError, IndexError, json.JSONDecodeError) as e:
         raise PodmanError(f"Could not parse bridge interface for {network_name}: {e}")
 
