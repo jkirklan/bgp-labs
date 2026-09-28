@@ -210,13 +210,37 @@ The `State/PfxRcd` column is the most important: `1` means Established and one p
 **Exercise 4: Verify route advertisement**
 
 ```bash
-# On lab03-router-a: see lab03-router-b's advertised prefix
 podman exec -it lab03-router-a vtysh -c "show ip bgp"
-# Expected: 192.168.2.0/24 with NEXT_HOP=10.0.12.2, AS_PATH=65002
+```
 
-# On lab03-router-b: see lab03-router-a's advertised prefix
+Output on router-a:
+```
+    Network          Next Hop            Metric LocPrf Weight Path
+ *> 192.168.1.0/24   0.0.0.0                  0         32768 i
+ *> 192.168.2.0/24   10.0.12.2                0             0 65002 i
+```
+
+Reading the columns:
+
+| Column | Meaning |
+|--------|---------|
+| `*` | Route is **valid** — next-hop is reachable |
+| `>` | Route is the **best path** — the one installed in the forwarding table |
+| `Network` | The prefix |
+| `Next Hop` | Where to send traffic for this prefix. `0.0.0.0` means the prefix is **locally originated** (this router owns it) |
+| `Metric` | The MED (Multi-Exit Discriminator) — hint to peers about preferred entry point; 0 means not set |
+| `LocPrf` | LOCAL_PREF — used to prefer paths within an AS; blank means it came from eBGP (covered in Lab 08) |
+| `Weight` | Cisco/FRR local preference (higher = preferred); `32768` is the default for locally originated routes, `0` for learned routes |
+| `Path` | The **AS_PATH** — list of ASes the route has traversed. `65002 i` means it was originated (`i` = IGP) inside AS65002 |
+
+What you're seeing:
+- `192.168.1.0/24  0.0.0.0  32768 i` — router-a's own prefix, locally originated, weight 32768
+- `192.168.2.0/24  10.0.12.2  65002 i` — learned from router-b (next-hop 10.0.12.2), originated in AS65002
+
+Router-b's table is the mirror image: it locally originates `192.168.2.0/24` and learned `192.168.1.0/24` from router-a with AS_PATH `65001`.
+
+```bash
 podman exec -it lab03-router-b vtysh -c "show ip bgp"
-# Expected: 192.168.1.0/24 with NEXT_HOP=10.0.12.1, AS_PATH=65001
 ```
 
 ## Verification
