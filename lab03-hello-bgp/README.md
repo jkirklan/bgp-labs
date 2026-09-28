@@ -13,8 +13,35 @@
 systems on the internet. Each network operator runs their own AS (Autonomous System),
 identified by an ASN (Autonomous System Number).
 
-BGP routers form **sessions** over TCP port 179. Before exchanging routes, they go
-through a handshake defined by the BGP Finite State Machine:
+BGP routers form **sessions** over TCP port 179. BGP is just a TCP application —
+the same way a browser sends HTTP over TCP port 80, a router sends BGP messages
+over TCP port 179. The packet structure is identical in both cases:
+
+```
+┌──────────────────────────────────────────────────┐  ┌──────────────────────────────────────────────────┐
+│ BGP control plane packet                         │  │ HTTP data plane packet                           │
+│  ┌────────────────────────────────────────────┐  │  │  ┌────────────────────────────────────────────┐  │
+│  │ IP  src: 10.0.12.1  dst: 10.0.12.2        │  │  │  │ IP  src: 10.0.12.1  dst: 93.184.216.34     │  │
+│  │  ┌──────────────────────────────────────┐  │  │  │  │  ┌──────────────────────────────────────┐  │  │
+│  │  │ TCP  sport: 54321  dport: 179        │  │  │  │  │  │ TCP  sport: 49152  dport: 80          │  │  │
+│  │  │  ┌────────────────────────────────┐  │  │  │  │  │  │  ┌────────────────────────────────┐  │  │  │
+│  │  │  │ BGP OPEN                       │  │  │  │  │  │  │  │ GET / HTTP/1.1                  │  │  │  │
+│  │  │  │  My AS:    65001               │  │  │  │  │  │  │  │ Host: example.com               │  │  │  │
+│  │  │  │  Hold Time: 90s                │  │  │  │  │  │  │  │                                │  │  │  │
+│  │  │  │  BGP ID:   10.0.12.1           │  │  │  │  │  │  │  │                                │  │  │  │
+│  │  │  └────────────────────────────────┘  │  │  │  │  │  │  └────────────────────────────────┘  │  │  │
+│  │  └──────────────────────────────────────┘  │  │  │  │  └──────────────────────────────────────┘  │  │
+│  └────────────────────────────────────────────┘  │  │  └────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────┘  └──────────────────────────────────────────────────┘
+         router-a ←→ router-b (control plane)                  your laptop → example.com (data plane)
+```
+
+BGP is the **control plane** — routers use it to tell each other which prefixes they
+can reach. HTTP is the **data plane** — actual user traffic flowing along the paths
+BGP established. Both are just TCP applications; only the port number and the payload
+differ.
+
+Before exchanging routes, BGP goes through a handshake defined by the BGP Finite State Machine:
 
 ```
 Idle → Connect → Active → OpenSent → OpenConfirm → Established
