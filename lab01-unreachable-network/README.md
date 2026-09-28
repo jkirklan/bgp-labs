@@ -71,7 +71,7 @@ You'll see a connected route for 10.1.0.0/24 but nothing for 10.2.0.0/24.
 
 **Reading the routing table**
 
-The output of `show ip route` on lab01-host-a (10.1.0.10) looks like this:
+The output of `show ip route` on lab01-host-a (10.1.0.10, on network lab01-net-a: 10.1.0.0/24) looks like this:
 
 ```
 K>* 0.0.0.0/0 [0/100] via 10.1.0.1, eth0, 00:06:13
