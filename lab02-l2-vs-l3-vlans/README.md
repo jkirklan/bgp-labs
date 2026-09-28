@@ -181,7 +181,7 @@ podman exec lab02-host-a1 ping -c 5 192.168.20.10
 # Expected: 5/5 success
 
 # SVI interfaces on lab02-router-a
-podman exec -it lab02-router-a vtysh -c "show ip interface brief"
+podman exec lab02-router-a vtysh -c "show interface brief"
 # Expected: eth0 192.168.10.254/24 up, eth1 192.168.20.254/24 up
 ```
 
