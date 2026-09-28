@@ -1,0 +1,10 @@
+{
+  "lab": "lab01-unreachable-network",
+  "routers": [
+    {"name": "lab01-router-a", "asn": 0, "interfaces": ["eth0", "eth1"]}
+  ],
+  "networks": [
+    {"name": "lab01-net-a", "subnet": "10.1.0.0/24", "vni": null},
+    {"name": "lab01-net-b", "subnet": "10.2.0.0/24", "vni": null}
+  ]
+}
