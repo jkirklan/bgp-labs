@@ -1,0 +1,14 @@
+{
+  "lab": "lab04-transit",
+  "routers": [
+    {"name": "lab04-router-a", "asn": 65001, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab04-router-b", "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab04-router-c", "asn": 65003, "interfaces": ["eth0", "eth1"]}
+  ],
+  "networks": [
+    {"name": "lab04-as1-as2-link", "subnet": "10.0.12.0/30", "vni": null},
+    {"name": "lab04-as2-as3-link", "subnet": "10.0.23.0/30", "vni": null},
+    {"name": "lab04-as1-internal", "subnet": "192.168.1.0/24", "vni": null},
+    {"name": "lab04-as3-internal", "subnet": "192.168.3.0/24", "vni": null}
+  ]
+}
