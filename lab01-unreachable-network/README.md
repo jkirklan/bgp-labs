@@ -82,11 +82,11 @@ Breaking it down column by column:
 
 | Field | Meaning |
 |-------|---------|
-| `K` / `C` / `S` / `B` | How the route was learned: **K**ernel, **C**onnected, **S**tatic, **B**GP — see [Route Source Codes](../../docs/04-reference/routing-source-codes.md) |
+| `K` / `C` / `S` / `B` | How the route was learned: **K**ernel, **C**onnected, **S**tatic, **B**GP — see [Route Source Codes](docs/04-reference/routing-source-codes.md) |
 | `>` | This is the **selected** (best) route for this prefix |
 | `*` | This route is installed in the **FIB** (forwarding table — packets actually use it) |
 | `0.0.0.0/0` | The destination **prefix** — written as `network-address/prefix-length`. The network address identifies the block; the `/24` (prefix length) means the first 24 bits are fixed, leaving 8 bits for hosts (256 addresses). `0.0.0.0/0` has no fixed bits — it matches every address and acts as the default route |
-| `[0/100]` | `[administrative-distance/metric]`. Lower AD wins when two protocols know the same prefix — see [Administrative Distance and Metric](../../docs/04-reference/routing-ad-metric.md) |
+| `[0/100]` | `[administrative-distance/metric]`. Lower AD wins when two protocols know the same prefix — see [Administrative Distance and Metric](docs/04-reference/routing-ad-metric.md) |
 | `via 10.1.0.1` | The **next-hop** — where to send the packet next. Here `10.1.0.1` is Podman's bridge gateway (not `lab01-router-a`), which is why the default route won't help reach lab01-net-b |
 | `eth0` | The outgoing interface |
 | `00:06:13` | How long this route has been in the table |
