@@ -16,5 +16,5 @@ echo "Step 2: Pulling debug container (nicolaka/netshoot) ..."
 podman pull docker.io/nicolaka/netshoot:latest
 echo ""
 echo "Done. Verify the build:"
-echo "  podman run --rm frr:latest vtysh --version"
+echo "  podman run --rm --entrypoint /usr/libexec/frr/watchfrr frr:latest --version"
 echo "  podman run --rm -it docker.io/nicolaka/netshoot bash"

@@ -113,7 +113,7 @@ copy from the builder? Why is there no `RUN dnf install` in the final stage?
 **Exercise 3: Verify FRR works**
 
 ```bash
-podman run --rm frr:latest vtysh --version
+podman run --rm --entrypoint /usr/libexec/frr/watchfrr frr:latest --version
 ```
 
 Expected output: `vtysh version X.X (FRRRouting)...`
@@ -156,7 +156,7 @@ podman network rm test-net
 
 ```bash
 podman image exists frr:latest && echo "OK: frr:latest present"
-podman run --rm frr:latest vtysh --version
+podman run --rm --entrypoint /usr/libexec/frr/watchfrr frr:latest --version
 podman image exists docker.io/nicolaka/netshoot && echo "OK: debug image present"
 ```
 
@@ -175,7 +175,7 @@ podman build --platform linux/amd64 -t frr:latest containerfiles/frr/
 **vtysh not found in image:**
 The image is distroless — `vtysh` is at `/usr/bin/vtysh`. Run:
 ```bash
-podman run --rm frr:latest /usr/bin/vtysh --version
+podman run --rm --entrypoint /usr/libexec/frr/watchfrr frr:latest --version
 ```
 
 **Debug container can't reach test-router:**
