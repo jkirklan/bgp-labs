@@ -48,7 +48,6 @@ lab01-router-a is the forwarder between the two networks.
 ```
 
 Three containers start: lab01-host-a, lab01-host-b, lab01-router-a.
-topology-watch opens at http://localhost:8301.
 
 Wait 5 seconds for FRR to initialize before running verification commands.
 
@@ -164,8 +163,3 @@ podman run --rm -it \
 # Inside: ip route, ping 10.2.0.10, ip neigh
 ```
 
-**topology-watch or packet-watch port already in use:**
-```bash
-pkill -f topology_watch; pkill -f packet_watch
-./setup.sh
-```
