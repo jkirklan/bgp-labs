@@ -54,10 +54,10 @@ router-d: eth0=10.0.24.2/30, eth1=10.0.34.2/30
 
 ```mermaid
 graph TD
-    A["AS65001<br>lab05-router-a<br>192.168.1.0/24"] -->|"10.0.12.0/30"| B["AS65002<br>lab05-router-b"]
-    A -->|"10.0.13.0/30"| C["AS65003<br>lab05-router-c"]
-    B -->|"10.0.24.0/30"| D["AS65004<br>lab05-router-d"]
-    C -->|"10.0.34.0/30"| D
+    A["AS65001<br>lab05-router-a<br>192.168.1.0/24"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab05-router-b"]
+    A  <-->|"10.0.13.0/30"| C["AS65003<br>lab05-router-c"]
+    B  <-->|"10.0.24.0/30"| D["AS65004<br>lab05-router-d"]
+    C  <-->|"10.0.34.0/30"| D
 ```
 
 router-a, router-b, router-c are pre-configured. router-d has TODO gaps.

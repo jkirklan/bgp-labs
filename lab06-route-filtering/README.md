@@ -50,8 +50,8 @@ router-c: eth0=10.0.23.2/30
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab06-router-a<br>advertises 3 prefixes"] -->|"10.0.12.0/30"| B["AS65002<br>lab06-router-b<br>(ISP, filters inbound)"]
-    B -->|"10.0.23.0/30"| C["AS65003<br>lab06-router-c"]
+    A["AS65001<br>lab06-router-a<br>advertises 3 prefixes"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab06-router-b<br>(ISP, filters inbound)"]
+    B  <-->|"10.0.23.0/30"| C["AS65003<br>lab06-router-c"]
 ```
 
 router-a and router-c are pre-configured. router-b has TODO gaps for you to fill in.

@@ -50,8 +50,8 @@ isp-backup:  eth0=10.0.13.2, advertises 0.0.0.0/0
 
 ```mermaid
 graph LR
-    C["AS65001<br>lab08-customer<br>192.168.100.1/24"] -->|"10.0.12.0/30<br>(primary)"| P["AS65002<br>lab08-isp-primary"]
-    C -->|"10.0.13.0/30<br>(backup)"| B["AS65003<br>lab08-isp-backup"]
+    C["AS65001<br>lab08-customer<br>192.168.100.1/24"]  <-->|"10.0.12.0/30<br>(primary)"| P["AS65002<br>lab08-isp-primary"]
+    C  <-->|"10.0.13.0/30<br>(backup)"| B["AS65003<br>lab08-isp-backup"]
 ```
 
 All three routers are pre-configured. The failover policy (LOCAL_PREF) is

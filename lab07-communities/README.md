@@ -44,9 +44,9 @@ peer:    eth0=10.0.30.2, advertises 172.16.3.0/24
 
 ```mermaid
 graph LR
-    CA["AS65001<br>lab07-cust-a<br>172.16.1.0/24"] -->|"10.0.10.0/30"| T["AS65000<br>lab07-transit"]
-    CB["AS65002<br>lab07-cust-b<br>172.16.2.0/24"] -->|"10.0.20.0/30"| T
-    T -->|"10.0.30.0/30"| P["AS65003<br>lab07-peer<br>172.16.3.0/24"]
+    CA["AS65001<br>lab07-cust-a<br>172.16.1.0/24"]  <-->|"10.0.10.0/30"| T["AS65000<br>lab07-transit"]
+    CB["AS65002<br>lab07-cust-b<br>172.16.2.0/24"]  <-->|"10.0.20.0/30"| T
+    T  <-->|"10.0.30.0/30"| P["AS65003<br>lab07-peer<br>172.16.3.0/24"]
 ```
 
 lab07-transit has TODO gaps (route-maps, community-lists). All others pre-configured.
