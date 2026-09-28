@@ -17,34 +17,23 @@ BGP routers form **sessions** over TCP port 179. BGP is just a TCP application �
 the same way a browser sends HTTP over TCP port 80, a router sends BGP messages
 over TCP port 179. The packet structure is identical in both cases:
 
-BGP control plane packet (router-a → router-b):
-```
-┌─────────────────────────────────────────┐
-│ IP  src: 10.0.12.1  dst: 10.0.12.2     │
-│  ┌───────────────────────────────────┐  │
-│  │ TCP  sport: 54321  dport: 179     │  │
-│  │  ┌─────────────────────────────┐  │  │
-│  │  │ BGP OPEN                    │  │  │
-│  │  │  My AS:     65001           │  │  │
-│  │  │  Hold Time: 90s             │  │  │
-│  │  │  BGP ID:    10.0.12.1       │  │  │
-│  │  └─────────────────────────────┘  │  │
-│  └───────────────────────────────────┘  │
-└─────────────────────────────────────────┘
-```
+```mermaid
+graph TB
+    subgraph bgp_pkt["BGP control plane — router-a to router-b"]
+        subgraph ip1["IP  src: 10.0.12.1  →  dst: 10.0.12.2"]
+            subgraph tcp1["TCP  dport: 179"]
+                open["BGP OPEN<br/>My AS: 65001 | Hold Time: 90s | BGP ID: 10.0.12.1"]
+            end
+        end
+    end
 
-HTTP data plane packet (your laptop → example.com):
-```
-┌─────────────────────────────────────────┐
-│ IP  src: 10.0.12.1  dst: 93.184.216.34 │
-│  ┌───────────────────────────────────┐  │
-│  │ TCP  sport: 49152  dport: 80      │  │
-│  │  ┌─────────────────────────────┐  │  │
-│  │  │ GET / HTTP/1.1              │  │  │
-│  │  │ Host: example.com           │  │  │
-│  │  └─────────────────────────────┘  │  │
-│  └───────────────────────────────────┘  │
-└─────────────────────────────────────────┘
+    subgraph http_pkt["HTTP data plane — your laptop to example.com"]
+        subgraph ip2["IP  src: 10.0.12.1  →  dst: 93.184.216.34"]
+            subgraph tcp2["TCP  dport: 80"]
+                get["GET / HTTP/1.1<br/>Host: example.com"]
+            end
+        end
+    end
 ```
 
 BGP is the **control plane** — routers use it to tell each other which prefixes they
