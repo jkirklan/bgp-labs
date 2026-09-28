@@ -23,7 +23,8 @@ def main():
         check_tshark()
     except RuntimeError as e:
         print(str(e), file=sys.stderr)
-        sys.exit(1)
+        print("packet-watch disabled — topology-watch still available.", file=sys.stderr)
+        sys.exit(0)
 
     lab_json = os.path.join(args.lab_dir, "lab.json")
     try:
