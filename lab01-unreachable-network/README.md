@@ -34,8 +34,8 @@ you need a routing *protocol* — which is what BGP is.
 
 ```mermaid
 graph LR
-    A["lab01-host-a<br>10.1.0.10/24"] -->|"lab01-net-a<br>10.1.0.0/24"| R["lab01-router-a<br>10.1.0.254 | 10.2.0.254"]
-    R -->|"lab01-net-b<br>10.2.0.0/24"| B["lab01-host-b<br>10.2.0.10/24"]
+    A["lab01-host-a<br>10.1.0.10/24"] <-->|"lab01-net-a<br>10.1.0.0/24"| R["lab01-router-a<br>10.1.0.254 | 10.2.0.254"]
+    R <-->|"lab01-net-b<br>10.2.0.0/24"| B["lab01-host-b<br>10.2.0.10/24"]
 ```
 
 All three containers run FRR. lab01-host-a and lab01-host-b act as end hosts;
@@ -68,6 +68,36 @@ podman exec -it lab01-host-a vtysh -c "show ip route"
 ```
 
 You'll see a connected route for 10.1.0.0/24 but nothing for 10.2.0.0/24.
+
+**Reading the routing table**
+
+The output of `show ip route` looks like this:
+
+```
+K>* 0.0.0.0/0 [0/100] via 10.1.0.1, eth0, 00:06:13
+C>* 10.1.0.0/24 is directly connected, eth0, 00:06:13
+```
+
+Breaking it down column by column:
+
+| Field | Meaning |
+|-------|---------|
+| `K` / `C` / `S` / `B` | How the route was learned: **K**ernel, **C**onnected, **S**tatic, **B**GP |
+| `>` | This is the **selected** (best) route for this prefix |
+| `*` | This route is installed in the **FIB** (forwarding table — packets actually use it) |
+| `0.0.0.0/0` | The destination prefix. `0.0.0.0/0` is the default route — matches everything |
+| `[0/100]` | `[administrative-distance/metric]`. Lower AD wins when two protocols know the same prefix |
+| `via 10.1.0.1` | The **next-hop** — where to send the packet next |
+| `eth0` | The outgoing interface |
+| `00:06:13` | How long this route has been in the table |
+
+What's missing from host-a's table: a route for `10.2.0.0/24`. Without it, host-a
+doesn't know where to send packets destined for host-b — they get dropped.
+
+Notice also that the default route (`0.0.0.0/0`) points to `10.1.0.1` — that's
+Podman's bridge gateway, not `lab01-router-a` (`10.1.0.254`). Even if host-a
+tried to use the default route to reach host-b, the packet would go to the wrong
+place. Static routes fix this by being more specific than the default.
 
 **Exercise 2: Add static routes**
 
