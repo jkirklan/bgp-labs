@@ -1,0 +1,10 @@
+{
+  "_source": {
+    "layers": {
+      "frame": {"frame.time_epoch": "1727285030.789"},
+      "ip": {"ip.src": "10.0.12.2", "ip.dst": "10.0.12.1"},
+      "tcp": {"tcp.srcport": "179", "tcp.dstport": "47231"},
+      "bgp": {"bgp.type": "4"}
+    }
+  }
+}

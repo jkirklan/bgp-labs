@@ -1,0 +1,14 @@
+{
+  "_source": {
+    "layers": {
+      "frame": {"frame.time_epoch": "1727285004.456"},
+      "ip": {"ip.src": "10.0.12.1", "ip.dst": "10.0.12.2"},
+      "tcp": {"tcp.srcport": "47231", "tcp.dstport": "179"},
+      "bgp": {
+        "bgp.type": "2",
+        "bgp.update.nlri_prefix": "10.1.0.0/24",
+        "bgp.path_attribute.as_path": "65001"
+      }
+    }
+  }
+}

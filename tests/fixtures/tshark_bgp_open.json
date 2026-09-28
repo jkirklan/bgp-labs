@@ -1,0 +1,15 @@
+{
+  "_source": {
+    "layers": {
+      "frame": {"frame.time_epoch": "1727285001.123"},
+      "ip": {"ip.src": "10.0.12.1", "ip.dst": "10.0.12.2"},
+      "tcp": {"tcp.srcport": "47231", "tcp.dstport": "179"},
+      "bgp": {
+        "bgp.type": "1",
+        "bgp.open.version": "4",
+        "bgp.open.as": "65001",
+        "bgp.open.holdtime": "90"
+      }
+    }
+  }
+}
