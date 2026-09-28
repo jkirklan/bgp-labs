@@ -1,0 +1,12 @@
+{
+  "lab": "lab08-failover",
+  "routers": [
+    {"name": "lab08-customer", "asn": 65001, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab08-isp-primary", "asn": 65002, "interfaces": ["eth0"]},
+    {"name": "lab08-isp-backup", "asn": 65003, "interfaces": ["eth0"]}
+  ],
+  "networks": [
+    {"name": "lab08-primary-link", "subnet": "10.0.12.0/30", "vni": null},
+    {"name": "lab08-backup-link",  "subnet": "10.0.13.0/30", "vni": null}
+  ]
+}

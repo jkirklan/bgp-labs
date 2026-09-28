@@ -1,0 +1,14 @@
+{
+  "lab": "lab07-communities",
+  "routers": [
+    {"name": "lab07-transit", "asn": 65000, "interfaces": ["eth0", "eth1", "eth2"]},
+    {"name": "lab07-cust-a", "asn": 65001, "interfaces": ["eth0"]},
+    {"name": "lab07-cust-b", "asn": 65002, "interfaces": ["eth0"]},
+    {"name": "lab07-peer", "asn": 65003, "interfaces": ["eth0"]}
+  ],
+  "networks": [
+    {"name": "lab07-transit-custa", "subnet": "10.0.10.0/30", "vni": null},
+    {"name": "lab07-transit-custb", "subnet": "10.0.20.0/30", "vni": null},
+    {"name": "lab07-transit-peer",  "subnet": "10.0.30.0/30", "vni": null}
+  ]
+}

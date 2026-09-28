@@ -1,0 +1,12 @@
+{
+  "lab": "lab06-route-filtering",
+  "routers": [
+    {"name": "lab06-router-a", "asn": 65001, "interfaces": ["eth0"]},
+    {"name": "lab06-router-b", "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab06-router-c", "asn": 65003, "interfaces": ["eth0"]}
+  ],
+  "networks": [
+    {"name": "lab06-as1-as2-link", "subnet": "10.0.12.0/30", "vni": null},
+    {"name": "lab06-as2-as3-link", "subnet": "10.0.23.0/30", "vni": null}
+  ]
+}
