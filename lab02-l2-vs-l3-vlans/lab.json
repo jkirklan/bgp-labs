@@ -1,0 +1,13 @@
+{
+  "lab": "lab02-l2-vs-l3-vlans",
+  "routers": [
+    {"name": "lab02-host-a1", "asn": 0, "interfaces": ["eth0"]},
+    {"name": "lab02-host-a2", "asn": 0, "interfaces": ["eth0"]},
+    {"name": "lab02-host-b1", "asn": 0, "interfaces": ["eth0"]},
+    {"name": "lab02-router-a", "asn": 0, "interfaces": ["eth0", "eth1"]}
+  ],
+  "networks": [
+    {"name": "lab02-vlan10", "subnet": "192.168.10.0/24", "vni": null},
+    {"name": "lab02-vlan20", "subnet": "192.168.20.0/24", "vni": null}
+  ]
+}
