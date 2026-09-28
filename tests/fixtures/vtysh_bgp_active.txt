@@ -1,0 +1,9 @@
+BGP router identifier 10.0.12.1, local AS number 65001 vrf-id 0
+BGP table version 0
+RIB entries 0, using 0 bytes of memory
+Peers 1, using 724 KiB of memory
+
+Neighbor        V         AS   MsgRcvd   MsgSent   TblVer  InQ OutQ  Up/Down State/PfxRcd   PfxSnt Desc
+10.0.12.2       4      65002         0         0        0    0    0    never        Active        0 N/A
+
+Total number of neighbors 1

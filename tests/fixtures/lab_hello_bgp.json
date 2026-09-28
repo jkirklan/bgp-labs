@@ -1,0 +1,11 @@
+{
+  "lab": "lab03-hello-bgp",
+  "routers": [
+    { "name": "router-a", "asn": 65001, "interfaces": ["eth0", "eth1"] },
+    { "name": "router-b", "asn": 65002, "interfaces": ["eth0"] }
+  ],
+  "networks": [
+    { "name": "lab03-as1-as2-link", "subnet": "10.0.12.0/30", "vni": null },
+    { "name": "lab03-as1-internal", "subnet": "192.168.1.0/24", "vni": null }
+  ]
+}
