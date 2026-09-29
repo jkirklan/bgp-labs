@@ -15,27 +15,37 @@ a sequence of attributes in order; the first attribute that differs picks the wi
 
 The most commonly exercised steps (in order):
 
-1. **Highest LOCAL_PREF** — prefer the locally-preferred path (default: 100)
-2. **Shortest AS_PATH** — fewer AS hops wins
-3. **Lowest ORIGIN** — IGP < EGP < incomplete
-4. **Lowest MED** — Multi-Exit Discriminator (hint from the peer about preferred entry)
-5. **eBGP over iBGP** — external beats internal
-6. **Lowest IGP metric to NEXT_HOP**
-7. **Oldest route** (for stability), then lowest Router ID
+| Step | Attribute | Who controls it | Rule | Scope |
+|------|-----------|----------------|------|-------|
+| 1 | **LOCAL_PREF** | Your AS (you set it on inbound routes) | Higher wins | Stays inside your AS — never sent to eBGP peers |
+| 2 | **AS_PATH length** | Any AS in the path (via prepending) | Shorter wins | Carried across all eBGP hops |
+| 3 | **ORIGIN** | The originating AS | IGP < EGP < incomplete | Rarely changed manually |
+| 4 | **MED** | Your neighboring AS (they set it on outbound routes) | Lower wins | Only compared between paths **from the same AS** |
+| 5 | **eBGP > iBGP** | Protocol | External wins | — |
+| 6 | **IGP metric to NEXT_HOP** | Your IGP | Lower wins | Internal tie-breaker |
+| 7 | **Router ID** | The peer | Lower wins | Last-resort tie-breaker |
 
-In this lab, router-d receives 192.168.1.0/24 via two paths:
+**LOCAL_PREF vs MED — the key distinction:**
+
+- **LOCAL_PREF** is set *by you* on routes you receive. It tells your own routers
+  which path to prefer when you have multiple upstream options. It is never
+  advertised to eBGP peers — it's purely internal to your AS.
+
+- **MED** is set *by your neighbor* on routes they send you. It's a hint from
+  them about which of their entry points you should use. It is only compared
+  between paths that came from the **same neighboring AS** — if router-b (AS65002)
+  and router-c (AS65003) are in different ASes, their MEDs are not compared.
+
+In this lab, router-d receives `192.168.1.0/24` via two paths:
 - Path via router-b: AS_PATH = `65002 65001`
 - Path via router-c: AS_PATH = `65003 65001`
 
-Both paths have the same AS_PATH length (2 hops), so BGP falls through to
-lower tie-breakers (MED, then router-id). You'll manipulate these to force
-a preference.
-
-**MED** (Multi-Exit Discriminator) is a hint from a neighboring AS about which
-entry point to use. Lower MED is preferred. It is only compared between paths
-from the *same* AS, so router-b and router-c must be in the same AS for MED
-to matter — in this lab they're in different ASes, so you'll use LOCAL_PREF
-or AS_PATH prepending to force selection.
+Both paths have the same AS_PATH length (2 hops), equal LOCAL_PREF, and MED
+can't be compared (different neighboring ASes). BGP falls to step 7 — **Oldest
+route** — and picks whichever path arrived first. This is a timing tiebreaker:
+it preserves stability, but you can't rely on it for traffic engineering.
+The exercises replace it with explicit policy: AS_PATH prepending (Exercise 2)
+and LOCAL_PREF (Exercise 3).
 
 ## Topology
 
@@ -60,7 +70,7 @@ graph TD
     C  <-->|"10.0.34.0/30"| D
 ```
 
-router-a, router-b, router-c are pre-configured. router-d has TODO gaps.
+All four routers are pre-configured. All sessions come up immediately on `./setup.sh`. The lab is about path selection policy — session setup was covered in Lab 03.
 
 ## Setup
 
@@ -68,104 +78,148 @@ router-a, router-b, router-c are pre-configured. router-d has TODO gaps.
 ./setup.sh
 ```
 
-Four containers start. router-d's sessions will be red (Idle) until configured.
+Four containers start with all BGP sessions pre-established. All four links show
+green immediately — no configuration needed before the exercises.
+
+Wait 5 seconds for FRR to initialize, then confirm all sessions are up:
+
+```bash
+podman exec -it lab05-router-d vtysh -c "show bgp summary"
+# Expected: two neighbors (10.0.24.1 and 10.0.34.1), both Established, PfxRcd=1 each
+```
 
 ## Exercises
 
-**Exercise 1: Configure router-d**
-
-Edit `configs/router-d.conf` — fill in the TODO sections:
-
-```
-neighbor 10.0.24.1 remote-as 65002
-neighbor 10.0.34.1 remote-as 65003
-...
- neighbor 10.0.24.1 activate
- neighbor 10.0.34.1 activate
-```
-
-Apply without restarting:
-
-```bash
-podman exec -i lab05-router-d vtysh << 'EOF'
-configure terminal
-router bgp 65004
- neighbor 10.0.24.1 remote-as 65002
- neighbor 10.0.34.1 remote-as 65003
- address-family ipv4 unicast
-  neighbor 10.0.24.1 activate
-  neighbor 10.0.34.1 activate
- exit-address-family
-end
-write memory
-EOF
-```
-
-**Exercise 2: See both paths**
+**Exercise 1: See both paths**
 
 ```bash
 podman exec -it lab05-router-d vtysh -c "show ip bgp 192.168.1.0/24"
 ```
 
-You'll see two entries. The `>` marker indicates the best path. Note the
-AS_PATH and NEXT_HOP for each.
+```bash
+podman exec -it lab05-router-d vtysh -c "show ip bgp 192.168.1.0/24"
+```
 
-**Exercise 3: Identify what picked the winner**
+```
+BGP routing table entry for 192.168.1.0/24, version 1
+Paths: (2 available, best #2, table default)
+  Advertised to non peer-group peers:
+  10.0.24.1 10.0.34.1
+  65003 65001
+    10.0.34.1 from 10.0.34.1 (10.0.13.2)
+      Origin IGP, valid, external
+      Last update: Mon Sep 28 21:51:42 2026
+  65002 65001
+    10.0.24.1 from 10.0.24.1 (10.0.12.2)
+      Origin IGP, valid, external, best (Older Path)
+      Last update: Mon Sep 28 21:51:42 2026
+```
 
-When AS_PATH lengths are equal, BGP falls to MED (but only compares paths
-from the same neighboring AS), then to router-id. Router-a has router-id
-`10.0.12.1` (lowest); router-b has `10.0.12.2`; router-c has `10.0.13.2`.
+Reading the header:
 
-The path via router-b (NEXT_HOP=10.0.24.1) wins because router-b's router-id
-(`10.0.12.2`) is lower than router-c's (`10.0.13.2`).
+| Field | Meaning |
+|-------|---------|
+| `192.168.1.0/24, version 1` | The prefix; `version 1` is the BGP table version when this entry was last updated |
+| `2 available` | Two paths exist — one via router-b, one via router-c |
+| `best #2` | The second-listed path is best. FRR lists paths oldest-first, not best-first — don't mistake list order for preference |
+| `Advertised to non peer-group peers: 10.0.24.1 10.0.34.1` | Router-d is re-advertising this prefix to both its peers (router-b and router-c) |
 
-**Exercise 4: Force traffic via router-c using AS_PATH prepending**
+Reading each path block:
 
-On router-b, prepend its own ASN once to make its path appear longer:
+```
+65003 65001                          ← AS_PATH: route transited AS65003, originated in AS65001
+  10.0.34.1 from 10.0.34.1 (10.0.13.2)
+  │           │                └── router-c's BGP router-id (its eth0 IP)
+  │           └── the peer that sent this update (router-c's eth1 IP, on the as3-as4 link)
+  └── NEXT_HOP: send traffic here to use this path
+    Origin IGP   ← route was originated with a `network` statement (cleanest origin)
+    valid        ← next-hop is reachable
+    external     ← learned via eBGP (different AS)
+                 ← no `best` marker — this path lost
+```
+
+```
+65002 65001                          ← AS_PATH: transited AS65002, originated in AS65001
+  10.0.24.1 from 10.0.24.1 (10.0.12.2)
+    Origin IGP, valid, external, best (Older Path)
+    │                               └── why it won: arrived before the other path
+    └── best: this is the path installed in the forwarding table
+```
+
+**Why `Older Path` decided it:** both paths have equal LOCAL_PREF (100), equal AS_PATH length (2 hops), equal ORIGIN, and MED is not compared between paths from different ASes (65002 vs 65003). BGP falls to step 7 — **oldest route** — and picks whichever arrived first. This is a stability tiebreaker, not a policy decision. It means the winner changes depending on which session came up first. The next exercises replace this timing accident with explicit policy.
+
+**Exercise 2: AS_PATH prepending — the neighbor's tool**
+
+AS_PATH prepending is how a neighboring AS signals "please use the other path." On router-b, prepend its own ASN to make its path appear one hop longer:
 
 ```bash
 podman exec -i lab05-router-b vtysh << 'EOF'
 configure terminal
 route-map PREPEND-OUT permit 10
  set as-path prepend 65002
-!
 router bgp 65002
  address-family ipv4 unicast
   neighbor 10.0.24.2 route-map PREPEND-OUT out
  exit-address-family
 end
-write memory
 EOF
 ```
 
-Wait for route refresh, then check router-d again:
+Trigger route refresh so router-d sees the updated path:
 
 ```bash
+podman exec -it lab05-router-b vtysh -c "clear bgp 10.0.24.2 soft out"
 podman exec -it lab05-router-d vtysh -c "show ip bgp 192.168.1.0/24"
-# Expected: path via router-c (AS_PATH 65003 65001) is now best
 ```
 
-**Exercise 5 (challenge): Use LOCAL_PREF to prefer router-b again**
+Expected: path via router-b now shows `AS_PATH = 65002 65002 65001` (3 hops vs 2) — router-c's path wins.
 
-Set LOCAL_PREF=200 on router-d for routes received from router-b:
+This is the **neighbor's** tool: router-b is influencing how router-d routes traffic *toward* it. Router-b cannot set LOCAL_PREF on router-d directly — LOCAL_PREF is always set by the receiving AS.
+
+**Exercise 3: LOCAL_PREF — your tool to override everything**
+
+LOCAL_PREF is set by *you* (router-d) on routes you receive. It is evaluated before AS_PATH, so it overrides the prepending done in Exercise 3. Set LOCAL_PREF=200 on routes received from router-b:
 
 ```bash
 podman exec -i lab05-router-d vtysh << 'EOF'
 configure terminal
-route-map SET-LOCALPREF permit 10
+route-map PREFER-B permit 10
  set local-preference 200
-!
 router bgp 65004
  address-family ipv4 unicast
-  neighbor 10.0.24.1 route-map SET-LOCALPREF in
+  neighbor 10.0.24.1 route-map PREFER-B in
  exit-address-family
 end
-write memory
 EOF
 ```
 
-LOCAL_PREF is checked before AS_PATH, so even the prepended path from router-b
-should win again.
+Trigger route refresh:
+
+```bash
+podman exec -it lab05-router-d vtysh -c "clear bgp 10.0.24.1 soft in"
+podman exec -it lab05-router-d vtysh -c "show ip bgp 192.168.1.0/24"
+```
+
+Expected: path via router-b wins again — `LocPrf=200` vs default `100` for router-c, despite router-b's longer AS_PATH. LOCAL_PREF beats AS_PATH in the selection algorithm.
+
+This is the **primary/backup upstream pattern**: set LOCAL_PREF=200 on your primary upstream's routes and all traffic follows that link. If it goes down, the backup (default LOCAL_PREF=100) takes over automatically.
+
+**Exercise 4 (challenge): Confirm LOCAL_PREF beats AS_PATH**
+
+Check the full BGP table on router-d to see both attributes side by side:
+
+```bash
+podman exec -it lab05-router-d vtysh -c "show ip bgp 192.168.1.0/24"
+```
+
+Expected output:
+```
+   Network          Next Hop       Metric LocPrf Weight Path
+*> 192.168.1.0/24  10.0.24.1           0    200      0 65002 65002 65001 i
+*  192.168.1.0/24  10.0.34.1           0    100      0 65003 65001 i
+```
+
+Router-b's path has a longer AS_PATH (3 hops vs 2) but wins because `LocPrf=200 > 100`. Step 1 of the algorithm (LOCAL_PREF) fires before step 2 (AS_PATH length) — the longer path never gets evaluated.
 
 ## Verification
 
