@@ -2,13 +2,14 @@
 set -euo pipefail
 
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${LAB_DIR}/../.." && pwd)"
+REPO_ROOT="$(cd "${LAB_DIR}/.." && pwd)"
+LABS_PARENT="$(cd "${REPO_ROOT}/.." && pwd)"
 
 echo "=== Lab 00: Build Your Router ==="
 echo ""
 ARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
 echo "Step 1: Building frr:latest from containerfiles/frr/ (platform: linux/${ARCH}) ..."
-cd "${REPO_ROOT}"
+[ -e "${LABS_PARENT}/labs" ] || ln -sf "${REPO_ROOT}" "${LABS_PARENT}/labs"
 podman build --platform "linux/${ARCH}" -t frr:latest containerfiles/frr/
 echo "frr:latest built successfully."
 echo ""

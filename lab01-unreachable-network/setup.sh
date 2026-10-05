@@ -2,7 +2,8 @@
 set -euo pipefail
 
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${LAB_DIR}/../.." && pwd)"
+REPO_ROOT="$(cd "${LAB_DIR}/.." && pwd)"
+LABS_PARENT="$(cd "${REPO_ROOT}/.." && pwd)"
 
 if ! podman image exists frr:latest; then
   echo "ERROR: frr:latest not found. Build it first:" >&2

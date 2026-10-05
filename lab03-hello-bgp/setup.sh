@@ -2,7 +2,8 @@
 set -euo pipefail
 
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${LAB_DIR}/../.." && pwd)"
+REPO_ROOT="$(cd "${LAB_DIR}/.." && pwd)"
+LABS_PARENT="$(cd "${REPO_ROOT}/.." && pwd)"
 
 if ! podman image exists frr:latest; then
   echo "ERROR: frr:latest not found. Run Lab 00 first." >&2
@@ -32,14 +33,14 @@ podman run -d --name lab03-router-b \
 sleep 3
 
 TOPO_PORT=8303
-cd "${REPO_ROOT}"
-${REPO_ROOT}/.venv/bin/python3 -c "
+[ -e "${LABS_PARENT}/labs" ] || ln -sf "${REPO_ROOT}" "${LABS_PARENT}/labs"
+PYTHONPATH="${LABS_PARENT}" ${REPO_ROOT}/.venv/bin/python3 -c "
 from labs.tools.topology_watch.app import create_app
 create_app('${LAB_DIR}/lab.json').run(host='127.0.0.1', port=${TOPO_PORT})
 " &
 echo $! > "${LAB_DIR}/.topology-watch.pid"
 
-${REPO_ROOT}/.venv/bin/python3 -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
+PYTHONPATH="${LABS_PARENT}" ${REPO_ROOT}/.venv/bin/python3 -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
 echo $! > "${LAB_DIR}/.packet-watch.pid"
 
 echo "Lab 03 is up. topology-watch: http://localhost:${TOPO_PORT}"

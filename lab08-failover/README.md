@@ -98,7 +98,8 @@ Kill the primary ISP container to simulate link loss:
 podman stop lab08-isp-primary
 ```
 
-Watch the customer detect the failure (hold timer expires after ~90s by default):
+All three routers are pre-configured with short timers (`timers 3 9`): keepalive=3s, hold=9s.
+Failover happens within ~10 seconds of the primary going down:
 
 ```bash
 # Watch logs for "NOTIFICATION received" or "bgp_read_packet error"

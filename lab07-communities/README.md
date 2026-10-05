@@ -75,8 +75,8 @@ podman exec -it lab07-cust-a vtysh -c "show ip bgp"
 Edit `configs/transit.conf` — fill in the route-maps and community-lists:
 
 ```
-community-list standard CUSTOMER permit 65000:100
-community-list standard PEER permit 65000:200
+bgp community-list standard CUSTOMER permit 65000:100
+bgp community-list standard PEER permit 65000:200
 
 route-map CUST-IN permit 10
  set community 65000:100
@@ -94,18 +94,24 @@ Apply the route-maps to the sessions:
 ```
 address-family ipv4 unicast
  neighbor 10.0.10.2 route-map CUST-IN in
+ neighbor 10.0.10.2 route-map CUST-ONLY-OUT out
  neighbor 10.0.20.2 route-map CUST-IN in
+ neighbor 10.0.20.2 route-map CUST-ONLY-OUT out
  neighbor 10.0.30.2 route-map PEER-IN in
  neighbor 10.0.30.2 route-map CUST-ONLY-OUT out
 ```
+
+**Why CUST-ONLY-OUT on all three sessions?** The filter is applied on every outbound direction:
+- To customers (10.0.10.2, 10.0.20.2): blocks peer routes from leaking downstream — this is the main goal
+- To the peer (10.0.30.2): peer only receives customer routes (not its own routes reflected back)
 
 Apply without restarting:
 
 ```bash
 podman exec -i lab07-transit vtysh << 'EOF'
 configure terminal
-community-list standard CUSTOMER permit 65000:100
-community-list standard PEER permit 65000:200
+bgp community-list standard CUSTOMER permit 65000:100
+bgp community-list standard PEER permit 65000:200
 !
 route-map CUST-IN permit 10
  set community 65000:100
@@ -121,7 +127,9 @@ route-map CUST-ONLY-OUT deny 100
 router bgp 65000
  address-family ipv4 unicast
   neighbor 10.0.10.2 route-map CUST-IN in
+  neighbor 10.0.10.2 route-map CUST-ONLY-OUT out
   neighbor 10.0.20.2 route-map CUST-IN in
+  neighbor 10.0.20.2 route-map CUST-ONLY-OUT out
   neighbor 10.0.30.2 route-map PEER-IN in
   neighbor 10.0.30.2 route-map CUST-ONLY-OUT out
  exit-address-family

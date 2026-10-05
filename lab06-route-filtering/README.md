@@ -141,11 +141,22 @@ podman exec -it lab06-router-c vtysh -c "show ip bgp"
 # Expected: only the two customer prefixes
 ```
 
-**Exercise 5: Show the prefix-list**
+**Exercise 5: See what router-b received before filtering**
+
+`soft-reconfiguration inbound` (configured in router-b.conf) tells FRR to store
+all routes as received from the peer, before any inbound filters are applied.
+This lets you see the full pre-filter RIB:
 
 ```bash
-podman exec -it lab06-router-b vtysh -c "show ip prefix-list CUSTOMER-IN"
-# Shows each entry with a hit counter — seq 100 (deny any) should have count > 0
+podman exec -it lab06-router-b vtysh -c "show bgp ipv4 unicast neighbors 10.0.12.1 received-routes"
+# Expected: all three prefixes (192.168.1.0/24, 192.168.2.0/24, 10.0.0.0/8) —
+# router-a is sending 10.0.0.0/8, but your filter dropped it from the BGP table
+```
+
+Compare with the accepted routes (post-filter):
+```bash
+podman exec -it lab06-router-b vtysh -c "show bgp ipv4 unicast neighbors 10.0.12.1 routes"
+# Expected: only 192.168.1.0/24 and 192.168.2.0/24
 ```
 
 **Exercise 6 (challenge): Apply an outbound filter**
