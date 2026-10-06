@@ -37,5 +37,6 @@ Each lab starts topology-watch (topology diagram) and packet-watch (live BGP mes
 
 ## Reference Docs
 
+- [L2 vs L3 Networking](docs/04-reference/l2-vs-l3-networking.md) — MAC addresses, ARP, broadcast domains, why L2 can't span subnets
 - [Route Source Codes](docs/04-reference/routing-source-codes.md) — K, C, S, B flags in `show ip route`
 - [Administrative Distance and Metric](docs/04-reference/routing-ad-metric.md) — what `[AD/metric]` means

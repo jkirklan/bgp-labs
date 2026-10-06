@@ -9,6 +9,8 @@
 
 ## Concepts
 
+> **Background reading:** [L2 vs L3 Networking](../docs/04-reference/l2-vs-l3-networking.md) — MAC addresses, ARP, broadcast domains, and why L2 can't span subnets.
+
 A **Podman network** behaves like a VLAN: all containers on the same network share a
 broadcast domain and can talk directly at L2 (via ARP). No routing needed.
 
