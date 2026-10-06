@@ -24,6 +24,8 @@ ALL_LABS = [
     "lab06-route-filtering",
     "lab07-communities",
     "lab08-failover",
+    "lab09-underlay-vs-overlay",
+    "lab10-microsegmentation",
 ]
 
 
