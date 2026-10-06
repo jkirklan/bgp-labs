@@ -35,5 +35,5 @@ Each lab starts topology-watch (topology diagram) and packet-watch (live BGP mes
 
 ## Reference Docs
 
-- [Route Source Codes](../docs/04-reference/routing-source-codes.md) — K, C, S, B flags in `show ip route`
-- [Administrative Distance and Metric](../docs/04-reference/routing-ad-metric.md) — what `[AD/metric]` means
+- [Route Source Codes](docs/04-reference/routing-source-codes.md) — K, C, S, B flags in `show ip route`
+- [Administrative Distance and Metric](docs/04-reference/routing-ad-metric.md) — what `[AD/metric]` means
