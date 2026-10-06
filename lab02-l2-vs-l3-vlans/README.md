@@ -209,6 +209,9 @@ podman exec lab02-router-a vtysh -c "show interface brief"
 
 ## Troubleshooting
 
+**`write memory` warns "Error renaming frr.conf.sav: Device or resource busy":**
+Harmless. FRR cannot rename the bind-mounted config file before rewriting it, but the config is written and routes are installed correctly. The `[OK]` line confirms success.
+
 **Cross-segment ping fails after adding routes:**
 Verify both hosts have return routes:
 ```bash

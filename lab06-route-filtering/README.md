@@ -199,6 +199,9 @@ podman exec -it lab06-router-c vtysh -c "show ip bgp"
 
 ## Troubleshooting
 
+**`write memory` warns "Error renaming frr.conf.sav: Device or resource busy":**
+Harmless. FRR cannot rename the bind-mounted config file before rewriting it, but the config is written and routes are installed correctly. The `[OK]` line confirms success.
+
 **Filter applied but prefix still visible:**
 You may not have triggered a soft reconfiguration after applying the filter:
 ```bash

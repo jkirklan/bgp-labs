@@ -198,6 +198,9 @@ podman exec -it lab08-customer vtysh -c "show ip route 0.0.0.0/0"
 
 ## Troubleshooting
 
+**`write memory` warns "Error renaming frr.conf.sav: Device or resource busy":**
+Harmless. FRR cannot rename the bind-mounted config file before rewriting it, but the config is written and routes are installed correctly. The `[OK]` line confirms success.
+
 **Both routes show LOCAL_PREF=100:**
 Check that the PRIMARY-IN route-map is applied inbound on `neighbor 10.0.12.2`.
 Run `show running-config` and verify the route-map line is present.

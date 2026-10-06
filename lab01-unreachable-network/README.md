@@ -148,6 +148,9 @@ podman exec lab01-host-a ping -c 5 10.2.0.10
 
 ## Troubleshooting
 
+**`write memory` warns "Error renaming frr.conf.sav: Device or resource busy":**
+Harmless. FRR cannot rename the bind-mounted config file before rewriting it, but the config is written and routes are installed correctly. The `[OK]` line confirms success.
+
 **Ping still fails after adding static routes:**
 Check that both hosts have the return route. lab01-host-a → lab01-host-b works
 (host-a has the route), but the reply can't get back without a route on host-b.

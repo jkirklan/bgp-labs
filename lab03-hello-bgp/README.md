@@ -265,6 +265,9 @@ podman run --rm -it --network container:lab03-router-a \
 
 ## Troubleshooting
 
+**`write memory` warns "Error renaming frr.conf.sav: Device or resource busy":**
+Harmless. FRR cannot rename the bind-mounted config file before rewriting it, but the config is written and routes are installed correctly. The `[OK]` line confirms success.
+
 **Session stays in Active (never reaches Established):**
 Check that both neighbor statements reference the *other* router's IP:
 - lab03-router-a: `neighbor 10.0.12.2 remote-as 65002`

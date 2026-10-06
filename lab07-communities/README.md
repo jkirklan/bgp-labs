@@ -208,6 +208,9 @@ podman exec -it lab07-cust-a vtysh -c "show ip bgp"
 
 ## Troubleshooting
 
+**`write memory` warns "Error renaming frr.conf.sav: Device or resource busy":**
+Harmless. FRR cannot rename the bind-mounted config file before rewriting it, but the config is written and routes are installed correctly. The `[OK]` line confirms success.
+
 **Community not appearing on transit:**
 Enable `send-community` on the neighbor session that sends the community. The
 customer configs already have `neighbor ... send-community`.
