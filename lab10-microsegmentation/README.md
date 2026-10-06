@@ -30,13 +30,21 @@ VNI 1002 (Tenant B — 192.168.20.0/24):
 
 ## Topology
 
-```
-UNDERLAY:
-[lab10-vtep-a AS65001]──lab10-underlay (10.0.12.0/30)──[lab10-vtep-b AS65002]
+**Underlay — BGP-routed /30 link**
 
-OVERLAY:
-VNI 1001 (Tenant A):  vtep-a 192.168.10.1 ─── vxlan0 ───  vtep-b 192.168.10.2
-VNI 1002 (Tenant B):  vtep-a 192.168.20.1 ─── vxlan1 ───  vtep-b 192.168.20.2
+```mermaid
+graph LR
+    A["AS65001 lab10-vtep-a<br>underlay: 10.0.12.1"]
+    <-->|"lab10-underlay 10.0.12.0/30<br>eBGP"| B["AS65002 lab10-vtep-b<br>underlay: 10.0.12.2"]
+```
+
+**Overlay — two isolated VXLAN segments**
+
+```mermaid
+graph LR
+    A1["lab10-vtep-a<br>Tenant A: 192.168.10.1 (vxlan0)<br>Tenant B: 192.168.20.1 (vxlan1)"]
+    <-->|"VNI 1001 — Tenant A"| B1["lab10-vtep-b<br>Tenant A: 192.168.10.2 (vxlan0)<br>Tenant B: 192.168.20.2 (vxlan1)"]
+    A1 <-->|"VNI 1002 — Tenant B"| B1
 ```
 
 Both VTEPs are pre-configured with BGP underlay and both VXLAN interfaces. VRF exercises are done live in Parts 2 and 3.

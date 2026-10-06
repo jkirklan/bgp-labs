@@ -23,7 +23,7 @@ trap cleanup EXIT
 
 echo "=== BGP Labs Smoke Test ==="
 echo "Host: $(uname -a)"
-echo "Podman: $(podman version --format '{{.Client.Version}}' 2>/dev/null || echo unknown)"
+echo "Podman: $(podman --version 2>/dev/null || echo unknown)"
 echo ""
 
 # ── Clone repo ───────────────────────────────────────────────────────────────
