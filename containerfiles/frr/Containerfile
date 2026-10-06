@@ -1,0 +1,26 @@
+# FRR routing image based on AlmaLinux 9.
+# FRR binaries install to /usr/libexec/frr/ on EL9 (not /usr/sbin/).
+# watchfrr monitors child daemons and runs in foreground — correct PID 1.
+FROM almalinux:9
+
+USER root
+
+# Add FRR stable repo and install FRR
+RUN dnf install -y https://rpm.frrouting.org/repo/frr-stable-repo-1-0.el9.noarch.rpm && \
+    dnf install -y frr && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
+
+# Runtime directories owned by frr
+RUN mkdir -p /var/run/frr /var/log/frr && \
+    chown frr:frr /var/run/frr /var/log/frr && \
+    chmod 750 /etc/frr
+
+# Default daemons config and container startup script
+COPY daemons /etc/frr/daemons
+COPY docker-start.sh /usr/local/bin/docker-start.sh
+RUN chmod +x /usr/local/bin/docker-start.sh
+
+# Run as root — watchfrr.sh requires root to spawn daemon child processes.
+# Capabilities required at runtime: --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN
+ENTRYPOINT ["/usr/local/bin/docker-start.sh"]
