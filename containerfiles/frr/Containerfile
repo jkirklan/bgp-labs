@@ -5,8 +5,8 @@ FROM almalinux:9
 
 USER root
 
-# Add FRR stable repo and install FRR
-RUN dnf install -y https://rpm.frrouting.org/repo/frr-stable-repo-1-0.el9.noarch.rpm && \
+# Install FRR via EPEL (more reliable than frrouting.org repo RPM URLs)
+RUN dnf install -y epel-release && \
     dnf install -y frr && \
     dnf clean all && \
     rm -rf /var/cache/dnf
