@@ -27,3 +27,14 @@ class LabConfig:
     @property
     def has_overlay(self) -> bool:
         return any(n.get("vni") is not None for n in self.networks)
+
+    @property
+    def vnis(self) -> list[int]:
+        seen: set[int] = set()
+        result: list[int] = []
+        for n in self.networks:
+            v = n.get("vni")
+            if v is not None and v not in seen:
+                seen.add(v)
+                result.append(v)
+        return sorted(result)

@@ -38,6 +38,16 @@ def get_bridge_iface(network_name: str) -> str:
         raise PodmanError(f"Could not parse bridge interface for {network_name}: {e}")
 
 
+def run_ip_command(container: str, args: str) -> str:
+    result = subprocess.run(
+        ["podman", "exec", "-i", container, "ip"] + args.split(),
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        raise PodmanError(f"ip command failed in {container}: {result.stderr.strip()}")
+    return result.stdout
+
+
 def check_tshark() -> None:
     if shutil.which("tshark") is None:
         raise RuntimeError(
