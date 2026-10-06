@@ -47,20 +47,26 @@ if [ "${PASS}" = true ]; then
     if ! podman info &>/dev/null; then
         echo "ERROR: podman info failed — Podman daemon is not reachable."
         echo "       macOS: start the Podman machine in Podman Desktop."
-        echo "       Linux: ensure the Podman socket is available (rootless: loginctl enable-linger \$USER)"
+        echo "       Linux: check that /etc/subuid and /etc/subgid have an entry for your user:"
+        echo "         grep \"\$(whoami)\" /etc/subuid /etc/subgid"
+        echo "         If missing: sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \$(whoami)"
         PASS=false
     fi
 fi
 
 if [ "${PASS}" = true ]; then
     # 5. Sufficient disk space (5 GB minimum for image build)
-    if command -v df &>/dev/null; then
-        AVAIL_KB="$(df -k "${LAB_DIR}" | awk 'NR==2 {print $4}')"
-        if [ -n "${AVAIL_KB}" ] && [ "${AVAIL_KB}" -lt 5242880 ]; then
-            AVAIL_GB="$(( AVAIL_KB / 1048576 ))"
-            echo "WARNING: Only ~${AVAIL_GB} GB free at ${LAB_DIR}. The FRR image build needs ~5 GB."
-            echo "         Continuing anyway — free up space if the build fails."
-        fi
+    # On macOS, check space inside the Podman machine (where the build actually runs).
+    # On Linux, check the local filesystem where container storage lives.
+    if [ "$(uname -s)" = "Darwin" ]; then
+        AVAIL_KB="$(podman machine ssh 'df -k / 2>/dev/null | awk NR==2{print $4}' 2>/dev/null || echo '')"
+    elif command -v df &>/dev/null; then
+        AVAIL_KB="$(df -k "${HOME}/.local/share/containers" 2>/dev/null | awk 'NR==2 {print $4}' || df -k "${LAB_DIR}" | awk 'NR==2 {print $4}')"
+    fi
+    if [ -n "${AVAIL_KB:-}" ] && [ "${AVAIL_KB}" -lt 5242880 ]; then
+        AVAIL_GB="$(( AVAIL_KB / 1048576 ))"
+        echo "WARNING: Only ~${AVAIL_GB} GB free for container storage. The FRR image build needs ~5 GB."
+        echo "         Continuing anyway — free up space if the build fails."
     fi
 fi
 
