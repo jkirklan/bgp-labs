@@ -1,0 +1,10 @@
+{
+  "lab": "lab09-underlay-vs-overlay",
+  "routers": [
+    {"name": "lab09-vtep-a", "asn": 65001, "interfaces": ["eth0"]},
+    {"name": "lab09-vtep-b", "asn": 65002, "interfaces": ["eth0"]}
+  ],
+  "networks": [
+    {"name": "lab09-underlay", "subnet": "10.0.12.0/30", "vni": 1001}
+  ]
+}
