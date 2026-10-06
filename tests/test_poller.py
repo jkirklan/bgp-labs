@@ -18,7 +18,7 @@ def test_established_session(cfg):
     with patch("labs.tools.topology_watch.poller.run_vtysh", return_value=ESTABLISHED):
         p = Poller(cfg, interval=999)
         p._poll_once()
-    neighbor = p.get_status()["router-a"]["10.0.12.2"]
+    neighbor = p.get_status()["router-a"]["bgp"]["10.0.12.2"]
     assert neighbor["state"] == "Established"
     assert neighbor["prefixes_received"] == 1
 
@@ -27,7 +27,7 @@ def test_active_session(cfg):
     with patch("labs.tools.topology_watch.poller.run_vtysh", return_value=ACTIVE):
         p = Poller(cfg, interval=999)
         p._poll_once()
-    neighbor = p.get_status()["router-a"]["10.0.12.2"]
+    neighbor = p.get_status()["router-a"]["bgp"]["10.0.12.2"]
     assert neighbor["state"] == "Active"
     assert neighbor["prefixes_received"] == 0
 
@@ -36,7 +36,9 @@ def test_vtysh_failure_yields_empty_dict(cfg):
     with patch("labs.tools.topology_watch.poller.run_vtysh", side_effect=Exception("boom")):
         p = Poller(cfg, interval=999)
         p._poll_once()
-    assert p.get_status()["router-a"] == {}
+    rs = p.get_status()["router-a"]
+    assert rs["bgp"] == {}
+    assert rs["vxlan"] == {}
 
 
 def test_initial_status_has_all_routers(cfg):
