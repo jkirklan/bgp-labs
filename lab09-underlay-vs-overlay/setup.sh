@@ -34,6 +34,7 @@ echo "Waiting 5s for FRR BGP to establish ..."
 sleep 5
 
 echo "Step 3: Configuring VXLAN tunnels (VNI 1001) ..."
+echo "  (If this step fails with 'No such device': see Troubleshooting in README.md — VXLAN kernel module may need loading)"
 podman exec lab09-vtep-a ip link add vxlan0 type vxlan id 1001 remote 10.0.12.2 dev eth0 dstport 4789
 podman exec lab09-vtep-a ip link set vxlan0 up
 podman exec lab09-vtep-a ip addr add 192.168.10.1/24 dev vxlan0

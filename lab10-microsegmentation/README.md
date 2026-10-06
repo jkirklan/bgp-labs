@@ -189,8 +189,9 @@ EOF
 ```
 
 ```bash
-podman exec -it lab10-vtep-a ip vrf exec Tenant-A ping -c 3 192.168.20.2
-# Expected: Success — specific prefix leaked; Tenant A can reach Tenant B's subnet
+podman exec -it lab10-vtep-a ip vrf exec Tenant-A ping -c 3 192.168.20.1
+# Expected: Success — Tenant A can reach vtep-a's own Tenant B address (192.168.20.1) via the leak
+# Note: pinging vtep-b's 192.168.20.2 would fail because vtep-b has no return route to 172.16.0.0/30
 ```
 
 The leak is **policy-driven and explicit** — it requires adding a specific route. No other traffic crosses tenants.
@@ -199,8 +200,8 @@ The leak is **policy-driven and explicit** — it requires adding a specific rou
 
 ```bash
 podman exec -it lab10-vtep-a ip route del vrf Tenant-A 192.168.20.0/24
-podman exec -it lab10-vtep-a ip vrf exec Tenant-A ping -c 3 192.168.20.2
-# Expected: fails again — isolation restored without restarting anything
+podman exec -it lab10-vtep-a ip vrf exec Tenant-A ping -c 3 192.168.20.1
+# Expected: fails — "Network is unreachable" — isolation restored without restarting anything
 ```
 
 ## Verification
@@ -230,6 +231,17 @@ podman exec -it lab10-vtep-a ip route show vrf Tenant-A
 
 ## Troubleshooting
 
+**setup.sh fails at "Configuring VXLAN tunnels" with "RTNETLINK answers: No such device":**
+The `vxlan` kernel module is not loaded. Run:
+```bash
+# macOS (inside the Podman machine):
+podman machine ssh -- sudo modprobe vxlan
+
+# Linux:
+sudo modprobe vxlan
+```
+Then re-run `./setup.sh`.
+
 **After `ip link set vxlan0 master Tenant-A`, within-VNI ping fails:**
 The IP address was removed when the interface was enslaved to the VRF. Re-add it:
 ```bash
@@ -242,6 +254,11 @@ The VRF device was not created or the name doesn't match. Check:
 ```bash
 podman exec -it lab10-vtep-a ip -br link show type vrf
 # Should list: Tenant-A and Tenant-B
+```
+If `ip route show vrf` is unavailable (older iproute2), use the table ID directly:
+```bash
+podman exec -it lab10-vtep-a ip route show table 100   # Tenant-A
+podman exec -it lab10-vtep-a ip route show table 101   # Tenant-B
 ```
 
 **Cross-VNI ping still works after VRF setup:**

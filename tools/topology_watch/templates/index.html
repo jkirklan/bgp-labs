@@ -64,6 +64,14 @@ async function main() {
     }
   });
 
+  // Overlay labs (all networks have VNI) produce no solid BGP links above.
+  // Add a BGP edge alongside each tunnel so session state remains visible.
+  if (links.length === 0 && tunnelLinks.length > 0) {
+    tunnelLinks.forEach(tl => {
+      links.push({ id: tl.id + "-bgp", source: tl.source, target: tl.target });
+    });
+  }
+
   const allLinks = links.concat(tunnelLinks);
 
   const svg = d3.select("#graph");
