@@ -10,6 +10,7 @@
     #graph { width: 100vw; height: calc(100vh - 38px); }
     .node-label { font-size: 11px; fill: #cbd5e1; pointer-events: none; }
     .link { stroke-width: 2.5; transition: stroke 0.4s; }
+    .tunnel-link { stroke-width: 2; stroke-dasharray: 6,3; transition: stroke 0.4s; }
     .tooltip { position: absolute; background: #1e293b; border: 1px solid #334155; padding: 8px 12px;
                border-radius: 4px; font-size: 11px; pointer-events: none; display: none; white-space: pre; }
   </style>
@@ -24,11 +25,19 @@ const COLORS = { Established:"#22c55e", Active:"#eab308", Connect:"#eab308",
 const DEFAULT = "#ef4444";
 
 function edgeState(srcName, status) {
-  const peers = status[srcName] || {};
-  const states = Object.values(peers).map(p => p.state);
+  const rs = status[srcName] || {};
+  const bgpPeers = rs.bgp || {};
+  const states = Object.values(bgpPeers).map(p => p.state);
   if (states.includes("Established")) return COLORS.Established;
   if (states.some(s => COLORS[s])) return COLORS.Active;
   return DEFAULT;
+}
+
+function tunnelColor(status) {
+  const allStates = Object.values(status).flatMap(rs =>
+    Object.values(rs.vxlan || {}));
+  if (allStates.length === 0) return DEFAULT;
+  return allStates.every(s => s === "UP") ? COLORS.Established : DEFAULT;
 }
 
 async function main() {
@@ -38,27 +47,38 @@ async function main() {
   const nodes = topo.routers.map(r => ({ id: r.name, asn: r.asn }));
   const seenPairs = new Set();
   const links = [];
+  const tunnelLinks = [];
+
   topo.networks.forEach(net => {
     for (let i = 0; i < nodes.length - 1; i++) {
       const key = `${nodes[i].id}-${nodes[i+1].id}`;
       if (!seenPairs.has(key)) {
         seenPairs.add(key);
-        links.push({ id: net.name, source: nodes[i].id, target: nodes[i+1].id });
+        if (net.vni != null) {
+          tunnelLinks.push({ id: net.name, source: nodes[i].id, target: nodes[i+1].id, vni: net.vni });
+        } else {
+          links.push({ id: net.name, source: nodes[i].id, target: nodes[i+1].id });
+        }
         break;
       }
     }
   });
 
+  const allLinks = links.concat(tunnelLinks);
+
   const svg = d3.select("#graph");
   const W = window.innerWidth, H = window.innerHeight - 38;
 
   const sim = d3.forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id(d => d.id).distance(200))
+    .force("link", d3.forceLink(allLinks).id(d => d.id).distance(200))
     .force("charge", d3.forceManyBody().strength(-500))
     .force("center", d3.forceCenter(W/2, H/2));
 
   const linkEls = svg.append("g").selectAll("line").data(links).join("line")
     .attr("class", "link").attr("stroke", DEFAULT);
+
+  const tunnelEls = svg.append("g").selectAll("line").data(tunnelLinks).join("line")
+    .attr("class", "tunnel-link").attr("stroke", DEFAULT);
 
   const nodeEls = svg.append("g").selectAll("circle").data(nodes).join("circle")
     .attr("r", 22).attr("fill", "#1e293b").attr("stroke", "#475569").attr("stroke-width", 2)
@@ -67,10 +87,13 @@ async function main() {
       .on("drag",  (e,d) => { d.fx=e.x; d.fy=e.y; })
       .on("end",   (e,d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
     .on("mouseover", (e,d) => {
-      document.getElementById("tt").style.display = "block";
-      document.getElementById("tt").style.left = (e.pageX+12)+"px";
-      document.getElementById("tt").style.top  = (e.pageY-10)+"px";
-      document.getElementById("tt").textContent = `${d.id}\nAS${d.asn}`;
+      const tt = document.getElementById("tt");
+      const rs = (window._lastStatus || {})[d.id] || {};
+      const vxlanStr = Object.entries(rs.vxlan || {}).map(([k,v]) => `  ${k}: ${v}`).join("\n");
+      tt.style.display = "block";
+      tt.style.left = (e.pageX+12)+"px";
+      tt.style.top  = (e.pageY-10)+"px";
+      tt.textContent = `${d.id}\nAS${d.asn}` + (vxlanStr ? `\n\nVXLAN:\n${vxlanStr}` : "");
     })
     .on("mouseout", () => { document.getElementById("tt").style.display="none"; });
 
@@ -81,14 +104,18 @@ async function main() {
   sim.on("tick", () => {
     linkEls.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y)
            .attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+    tunnelEls.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y)
+             .attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
     nodeEls.attr("cx",d=>d.x).attr("cy",d=>d.y);
     labelEls.attr("x",d=>d.x).attr("y",d=>d.y);
   });
 
   async function refresh() {
     const status = await fetch("/api/status").then(r => r.json());
+    window._lastStatus = status;
     linkEls.attr("stroke", d => edgeState(
       typeof d.source === "object" ? d.source.id : d.source, status));
+    tunnelEls.attr("stroke", tunnelColor(status));
   }
   refresh();
   setInterval(refresh, 3000);
