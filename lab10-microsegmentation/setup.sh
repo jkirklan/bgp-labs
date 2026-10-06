@@ -2,7 +2,6 @@
 set -euo pipefail
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${LAB_DIR}/.." && pwd)"
-LABS_PARENT="$(cd "${REPO_ROOT}/.." && pwd)"
 TOPO_PORT=8310
 
 echo "=== Lab 10: Microsegmentation ==="
@@ -59,15 +58,7 @@ podman exec lab10-vtep-b ip link set vxlan1 up
 podman exec lab10-vtep-b ip addr add 192.168.20.2/24 dev vxlan1
 
 echo "Step 4: Starting visualization tools ..."
-[ -e "${LABS_PARENT}/labs" ] || ln -sf "${REPO_ROOT}" "${LABS_PARENT}/labs"
-PYTHONPATH="${LABS_PARENT}" ${REPO_ROOT}/.venv/bin/python3 -c "
-from labs.tools.topology_watch.app import create_app
-create_app('${LAB_DIR}/lab.json').run(host='127.0.0.1', port=${TOPO_PORT})
-" &
-echo $! > "${LAB_DIR}/.topology-watch.pid"
-
-PYTHONPATH="${LABS_PARENT}" ${REPO_ROOT}/.venv/bin/python3 -m labs.tools.packet_watch.packet_watch --lab-dir "${LAB_DIR}" &
-echo $! > "${LAB_DIR}/.packet-watch.pid"
+. "${REPO_ROOT}/scripts/start-watchers.sh"
 
 echo ""
 echo "Lab 10 is up."
