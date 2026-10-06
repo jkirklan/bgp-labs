@@ -12,8 +12,8 @@ fi
 
 "${LAB_DIR}/teardown.sh" 2>/dev/null || true
 
-podman network create --subnet 192.168.10.0/24 lab02-vlan10
-podman network create --subnet 192.168.20.0/24 lab02-vlan20
+podman network create --subnet 192.168.10.0/24 --internal lab02-vlan10
+podman network create --subnet 192.168.20.0/24 --internal lab02-vlan20
 
 podman run -d --name lab02-host-a1 \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \

@@ -13,8 +13,8 @@ fi
 
 "${LAB_DIR}/teardown.sh" 2>/dev/null || true
 
-podman network create --subnet 10.1.0.0/24 lab01-net-a
-podman network create --subnet 10.2.0.0/24 lab01-net-b
+podman network create --subnet 10.1.0.0/24 --internal lab01-net-a
+podman network create --subnet 10.2.0.0/24 --internal lab01-net-b
 
 podman run -d --name lab01-host-a \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
