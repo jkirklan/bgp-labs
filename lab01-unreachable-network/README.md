@@ -28,14 +28,14 @@ you need a routing *protocol* — which is what BGP is.
 
 ```
 [lab01-host-a]────────────[lab01-router-a]────────────[lab01-host-b]
- 10.1.0.10/24          10.1.0.254  10.2.0.254          10.2.0.10/24
-      lab01-net-a (10.1.0.0/24)   lab01-net-b (10.2.0.0/24)
+ 192.168.101.10/24          192.168.101.254  192.168.102.254          192.168.102.10/24
+      lab01-net-a (192.168.101.0/24)   lab01-net-b (192.168.102.0/24)
 ```
 
 ```mermaid
 graph LR
-    A["lab01-host-a<br>10.1.0.10/24"] <-->|"lab01-net-a<br>10.1.0.0/24"| R["lab01-router-a<br>10.1.0.254 | 10.2.0.254"]
-    R <-->|"lab01-net-b<br>10.2.0.0/24"| B["lab01-host-b<br>10.2.0.10/24"]
+    A["lab01-host-a<br>192.168.101.10/24"] <-->|"lab01-net-a<br>192.168.101.0/24"| R["lab01-router-a<br>192.168.101.254 | 192.168.102.254"]
+    R <-->|"lab01-net-b<br>192.168.102.0/24"| B["lab01-host-b<br>192.168.102.10/24"]
 ```
 
 All three containers run FRR. lab01-host-a and lab01-host-b act as end hosts;
@@ -56,24 +56,24 @@ Wait 5 seconds for FRR to initialize before running verification commands.
 **Exercise 1: Confirm the failure**
 
 ```bash
-podman exec lab01-host-a ping -c 5 10.2.0.10
+podman exec lab01-host-a ping -c 5 192.168.102.10
 ```
 
-Expected: `Destination Host Unreachable` or no reply. lab01-host-a has no route to 10.2.0.0/24.
+Expected: `Destination Host Unreachable` or no reply. lab01-host-a has no route to 192.168.102.0/24.
 
 Inspect lab01-host-a's routing table:
 ```bash
 podman exec -it lab01-host-a vtysh -c "show ip route"
 ```
 
-You'll see a connected route for 10.1.0.0/24 but nothing for 10.2.0.0/24.
+You'll see a connected route for 192.168.101.0/24 but nothing for 192.168.102.0/24.
 
 **Reading the routing table**
 
-The output of `show ip route` on lab01-host-a (10.1.0.10, on network lab01-net-a: 10.1.0.0/24) looks like this:
+The output of `show ip route` on lab01-host-a (192.168.101.10, on network lab01-net-a: 192.168.101.0/24) looks like this:
 
 ```
-C>* 10.1.0.0/24 is directly connected, eth0, 00:06:13
+C>* 192.168.101.0/24 is directly connected, eth0, 00:06:13
 ```
 
 Breaking it down column by column:
@@ -83,12 +83,12 @@ Breaking it down column by column:
 | `C` / `S` / `B` | How the route was learned: **C**onnected, **S**tatic, **B**GP — see [Route Source Codes](../docs/04-reference/routing-source-codes.md) |
 | `>` | This is the **selected** (best) route for this prefix |
 | `*` | This route is installed in the **FIB** (forwarding table — packets actually use it) |
-| `10.1.0.0/24` | The destination **prefix** — written as `network-address/prefix-length`. The `/24` means the first 24 bits are fixed, leaving 8 bits for hosts (256 addresses) |
+| `192.168.101.0/24` | The destination **prefix** — written as `network-address/prefix-length`. The `/24` means the first 24 bits are fixed, leaving 8 bits for hosts (256 addresses) |
 | `[0/0]` | `[administrative-distance/metric]`. Connected routes have AD=0 — lowest possible, always preferred — see [Administrative Distance and Metric](../docs/04-reference/routing-ad-metric.md) |
 | `eth0` | The outgoing interface |
 | `00:06:13` | How long this route has been in the table |
 
-What's missing from host-a's table: a route for `10.2.0.0/24`. Without it, host-a
+What's missing from host-a's table: a route for `192.168.102.0/24`. Without it, host-a
 doesn't know where to send packets destined for host-b — they get dropped.
 
 The lab uses isolated internal networks (no bridge gateway), so host-a has only its
@@ -97,11 +97,11 @@ real networks behave when routers aren't configured to forward traffic.
 
 **Exercise 2: Add static routes**
 
-On lab01-host-a, add a route for the 10.2.0.0/24 network via lab01-router-a:
+On lab01-host-a, add a route for the 192.168.102.0/24 network via lab01-router-a:
 ```bash
 podman exec -i lab01-host-a vtysh << 'EOF'
 configure terminal
-ip route 10.2.0.0/24 10.1.0.254
+ip route 192.168.102.0/24 192.168.101.254
 end
 write memory
 EOF
@@ -111,7 +111,7 @@ On lab01-host-b, add a return route:
 ```bash
 podman exec -i lab01-host-b vtysh << 'EOF'
 configure terminal
-ip route 10.1.0.0/24 10.2.0.254
+ip route 192.168.101.0/24 192.168.102.254
 end
 write memory
 EOF
@@ -120,7 +120,7 @@ EOF
 **Exercise 3: Verify reachability**
 
 ```bash
-podman exec lab01-host-a ping -c 5 10.2.0.10
+podman exec lab01-host-a ping -c 5 192.168.102.10
 ```
 
 Expected: `!!!!!` (5 successful pings). Watch packet-watch show the ICMP traffic.
@@ -136,13 +136,13 @@ each router by hand. This is why BGP exists.
 ```bash
 # Routing tables
 podman exec -it lab01-host-a vtysh -c "show ip route"
-# Should show: S 10.2.0.0/24 [1/0] via 10.1.0.254
+# Should show: S 192.168.102.0/24 [1/0] via 192.168.101.254
 
 podman exec -it lab01-host-b vtysh -c "show ip route"
-# Should show: S 10.1.0.0/24 [1/0] via 10.2.0.254
+# Should show: S 192.168.101.0/24 [1/0] via 192.168.102.254
 
 # Connectivity
-podman exec lab01-host-a ping -c 5 10.2.0.10
+podman exec lab01-host-a ping -c 5 192.168.102.10
 # Should show: 5/5 packets received
 ```
 
@@ -160,6 +160,6 @@ Check that both hosts have the return route. lab01-host-a → lab01-host-b works
 podman run --rm -it \
   --network container:lab01-host-a \
   docker.io/nicolaka/netshoot bash
-# Inside: ip route, ping 10.2.0.10, ip neigh
+# Inside: ip route, ping 192.168.102.10, ip neigh
 ```
 

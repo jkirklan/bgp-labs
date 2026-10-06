@@ -65,8 +65,8 @@ sleep 3
 
 # ── Exercise 1: ping should FAIL ─────────────────────────────────────────────
 echo ""
-echo "[4/5] Exercise 1 — ping 10.2.0.10 (should fail)..."
-if podman exec lab01-host-a ping -c 3 -W 2 10.2.0.10 &>/dev/null; then
+echo "[4/5] Exercise 1 — ping 192.168.102.10 (should fail)..."
+if podman exec lab01-host-a ping -c 3 -W 2 192.168.102.10 &>/dev/null; then
   fail "ping SUCCEEDED — should have failed (network isolation broken)"
 else
   pass "ping correctly failed (network is isolated)"
@@ -77,21 +77,21 @@ echo ""
 echo "[5/5] Adding static routes and verifying connectivity..."
 podman exec -i lab01-host-a vtysh << 'EOF'
 configure terminal
-ip route 10.2.0.0/24 10.1.0.254
+ip route 192.168.102.0/24 192.168.101.254
 end
 write memory
 EOF
 
 podman exec -i lab01-host-b vtysh << 'EOF'
 configure terminal
-ip route 10.1.0.0/24 10.2.0.254
+ip route 192.168.101.0/24 192.168.102.254
 end
 write memory
 EOF
 
 sleep 1
 
-if podman exec lab01-host-a ping -c 3 -W 2 10.2.0.10 &>/dev/null; then
+if podman exec lab01-host-a ping -c 3 -W 2 192.168.102.10 &>/dev/null; then
   pass "ping SUCCEEDED after static routes (routing works)"
 else
   fail "ping FAILED after static routes — routing broken"
