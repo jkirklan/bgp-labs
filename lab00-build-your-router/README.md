@@ -6,6 +6,59 @@
 - Understand distroless multi-stage container builds
 - Learn two debug container usage patterns: namespace join and network observer
 
+## Prerequisites
+
+These labs require Podman 4.x or later with rootless container support.
+
+### macOS
+
+Install [Podman Desktop](https://podman-desktop.io) — it bundles everything you need including the Podman CLI and a Linux VM (Podman Machine) that runs the actual containers.
+
+1. Download and install Podman Desktop from **https://podman-desktop.io**
+2. Open Podman Desktop and follow the setup wizard — it initializes a Podman Machine automatically
+3. Verify from your terminal:
+
+```bash
+podman machine list        # should show a running machine
+podman run --rm hello-world
+```
+
+> **Apple Silicon (M1/M2/M3/M4):** All labs are tested on arm64. The FRR build in Lab 00 auto-detects your architecture.
+
+> **Minimum resources:** Podman Machine defaults (2 CPU, 2 GB RAM, 100 GB disk) are sufficient for all labs.
+
+### Linux
+
+Podman is available in most distribution package managers. Install it and verify rootless mode works:
+
+**RHEL / Fedora / CentOS Stream:**
+```bash
+sudo dnf install -y podman
+```
+
+**Ubuntu / Debian:**
+```bash
+sudo apt-get install -y podman
+```
+
+**After installing:**
+```bash
+podman run --rm hello-world    # should succeed without sudo
+```
+
+If rootless mode fails (common on fresh installs), follow the [rootless setup guide](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md) — typically requires `/etc/subuid` and `/etc/subgid` entries for your user.
+
+Alternatively, install [Podman Desktop for Linux](https://podman-desktop.io) for a GUI that handles rootless configuration automatically.
+
+### Common check (all platforms)
+
+```bash
+podman version              # Podman version 4.x or later
+podman info | grep -i root  # should show "rootless: true"
+```
+
+If these pass, you're ready. Run `./setup.sh` to build the FRR image.
+
 ## Concepts
 
 FRR (Free Range Routing) is an open-source routing daemon suite that implements BGP,
