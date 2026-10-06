@@ -85,7 +85,7 @@ echo ""
 ARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
 echo "Step 1: Building frr:latest from containerfiles/frr/ (platform: linux/${ARCH}) ..."
 [ -e "${LABS_PARENT}/labs" ] || ln -sf "${REPO_ROOT}" "${LABS_PARENT}/labs"
-podman build --platform "linux/${ARCH}" -t frr:latest containerfiles/frr/
+podman build --platform "linux/${ARCH}" -t frr:latest "${REPO_ROOT}/containerfiles/frr/"
 echo "frr:latest built successfully."
 echo ""
 echo "Step 2: Pulling debug container (nicolaka/netshoot) ..."
