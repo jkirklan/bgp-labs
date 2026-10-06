@@ -22,6 +22,7 @@ echo "Step 2: Starting routers ..."
 
 podman run -d --name lab08-customer \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab08-primary-link:interface_name=eth0,ip=10.0.12.1 \
     --network lab08-backup-link:interface_name=eth1,ip=10.0.13.1 \
     -v "${LAB_DIR}/configs/customer.conf:/etc/frr/frr.conf:ro,z" \
@@ -29,12 +30,14 @@ podman run -d --name lab08-customer \
 
 podman run -d --name lab08-isp-primary \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab08-primary-link:interface_name=eth0,ip=10.0.12.2 \
     -v "${LAB_DIR}/configs/isp-primary.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest
 
 podman run -d --name lab08-isp-backup \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab08-backup-link:interface_name=eth0,ip=10.0.13.2 \
     -v "${LAB_DIR}/configs/isp-backup.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest

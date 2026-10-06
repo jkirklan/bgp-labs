@@ -22,12 +22,14 @@ echo "Step 2: Starting routers ..."
 
 podman run -d --name lab06-router-a \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab06-as1-as2-link:interface_name=eth0,ip=10.0.12.1 \
     -v "${LAB_DIR}/configs/router-a.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest
 
 podman run -d --name lab06-router-b \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab06-as1-as2-link:interface_name=eth0,ip=10.0.12.2 \
     --network lab06-as2-as3-link:interface_name=eth1,ip=10.0.23.1 \
     -v "${LAB_DIR}/configs/router-b.conf:/etc/frr/frr.conf:ro,z" \
@@ -35,6 +37,7 @@ podman run -d --name lab06-router-b \
 
 podman run -d --name lab06-router-c \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab06-as2-as3-link:interface_name=eth0,ip=10.0.23.2 \
     -v "${LAB_DIR}/configs/router-c.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest

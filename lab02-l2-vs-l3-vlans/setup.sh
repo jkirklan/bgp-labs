@@ -17,24 +17,28 @@ podman network create --subnet 192.168.20.0/24 --internal lab02-vlan20
 
 podman run -d --name lab02-host-a1 \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
   --network lab02-vlan10:ip=192.168.10.10 \
   -v "${LAB_DIR}/configs/host-a1.conf:/etc/frr/frr.conf:Z" \
   frr:latest
 
 podman run -d --name lab02-host-a2 \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
   --network lab02-vlan10:ip=192.168.10.11 \
   -v "${LAB_DIR}/configs/host-a2.conf:/etc/frr/frr.conf:Z" \
   frr:latest
 
 podman run -d --name lab02-host-b1 \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
   --network lab02-vlan20:ip=192.168.20.10 \
   -v "${LAB_DIR}/configs/host-b1.conf:/etc/frr/frr.conf:Z" \
   frr:latest
 
 podman run -d --name lab02-router-a \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
   --network lab02-vlan10:ip=192.168.10.254 \
   --network lab02-vlan20:ip=192.168.20.254 \
   -v "${LAB_DIR}/configs/router-a.conf:/etc/frr/frr.conf:Z" \

@@ -27,6 +27,7 @@ echo "Step 2: Starting routers ..."
 # Router A — AS65001, connected to as1-as2-link and as1-internal
 podman run -d --name lab04-router-a \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab04-as1-as2-link:interface_name=eth0,ip=10.0.12.1 \
     --network lab04-as1-internal:interface_name=eth1,ip=192.168.1.1 \
     -v "${LAB_DIR}/configs/router-a.conf:/etc/frr/frr.conf:ro,z" \
@@ -35,6 +36,7 @@ podman run -d --name lab04-router-a \
 # Router B — AS65002, transit provider
 podman run -d --name lab04-router-b \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab04-as1-as2-link:interface_name=eth0,ip=10.0.12.2 \
     --network lab04-as2-as3-link:interface_name=eth1,ip=10.0.23.1 \
     -v "${LAB_DIR}/configs/router-b.conf:/etc/frr/frr.conf:ro,z" \
@@ -43,6 +45,7 @@ podman run -d --name lab04-router-b \
 # Router C — AS65003, connected to as2-as3-link and as3-internal
 podman run -d --name lab04-router-c \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab04-as2-as3-link:interface_name=eth0,ip=10.0.23.2 \
     --network lab04-as3-internal:interface_name=eth1,ip=192.168.3.1 \
     -v "${LAB_DIR}/configs/router-c.conf:/etc/frr/frr.conf:ro,z" \

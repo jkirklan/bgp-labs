@@ -23,6 +23,7 @@ echo "Step 2: Starting routers ..."
 
 podman run -d --name lab07-transit \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab07-transit-custa:interface_name=eth0,ip=10.0.10.1 \
     --network lab07-transit-custb:interface_name=eth1,ip=10.0.20.1 \
     --network lab07-transit-peer:interface_name=eth2,ip=10.0.30.1 \
@@ -31,18 +32,21 @@ podman run -d --name lab07-transit \
 
 podman run -d --name lab07-cust-a \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab07-transit-custa:interface_name=eth0,ip=10.0.10.2 \
     -v "${LAB_DIR}/configs/cust-a.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest
 
 podman run -d --name lab07-cust-b \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab07-transit-custb:interface_name=eth0,ip=10.0.20.2 \
     -v "${LAB_DIR}/configs/cust-b.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest
 
 podman run -d --name lab07-peer \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
     --network lab07-transit-peer:interface_name=eth0,ip=10.0.30.2 \
     -v "${LAB_DIR}/configs/peer.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest

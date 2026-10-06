@@ -18,6 +18,7 @@ podman network create --subnet 192.168.2.0/24 lab03-as2-internal
 
 podman run -d --name lab03-router-a \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
   --network lab03-as1-as2-link:ip=10.0.12.1 \
   --network lab03-as1-internal:ip=192.168.1.1 \
   -v "${LAB_DIR}/configs/router-a.conf:/etc/frr/frr.conf:Z" \
@@ -25,6 +26,7 @@ podman run -d --name lab03-router-a \
 
 podman run -d --name lab03-router-b \
   --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
+  --sysctl net.ipv4.ip_forward=1 \
   --network lab03-as1-as2-link:ip=10.0.12.2 \
   --network lab03-as2-internal:ip=192.168.2.1 \
   -v "${LAB_DIR}/configs/router-b.conf:/etc/frr/frr.conf:Z" \
