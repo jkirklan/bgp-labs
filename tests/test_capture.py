@@ -1,11 +1,14 @@
 import io
 import threading
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 from labs.tools.packet_watch.capture import start_capture
 
+_FIXTURES = Path(__file__).parent / "fixtures"
+
 
 def test_capture_buffers_multiline_json():
-    fixture = open("labs/tests/fixtures/tshark_stream_split.txt").read()
+    fixture = (_FIXTURES / "tshark_stream_split.txt").read_text()
     received = []
     stop = threading.Event()
 
