@@ -23,6 +23,8 @@ cd labs/lab00-build-your-router && ./setup.sh
 | [Lab 06](lab06-route-filtering/README.md) | Route Filtering | prefix-lists, route-maps, inbound filtering |
 | [Lab 07](lab07-communities/README.md) | Communities | BGP communities, policy tagging, CUST-ONLY-OUT |
 | [Lab 08](lab08-failover/README.md) | Failover | LOCAL_PREF, primary/backup paths, convergence |
+| [Lab 09](lab09-underlay-vs-overlay/README.md) | Underlay vs Overlay | VXLAN, VNI, tunneling, encapsulation |
+| [Lab 10](lab10-microsegmentation/README.md) | Microsegmentation | VRF, dual-VNI, inter-VRF routing, tenant isolation |
 
 ## Tools
 
@@ -30,7 +32,7 @@ Each lab starts topology-watch (topology diagram) and packet-watch (live BGP mes
 
 | Tool | Port | Description |
 |------|------|-------------|
-| topology-watch | 8300–8308 | Live topology diagram (Lab 00 = 8300, Lab 01 = 8301, …) |
+| topology-watch | 8300–8310 | Live topology diagram (Lab 00 = 8300, Lab 01 = 8301, …) |
 | packet-watch | — | Terminal BGP/VXLAN packet viewer (requires tshark) |
 
 ## Reference Docs

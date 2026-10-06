@@ -1,0 +1,44 @@
+minimumLimaVersion: 2.0.0
+
+base:
+- template:_images/almalinux-9
+- template:_default/mounts
+
+containerd:
+  system: false
+  user: false
+
+provision:
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    # Install podman and git
+    command -v podman >/dev/null 2>&1 && test -e /etc/lima-bgp-labs && exit 0
+    dnf -y install --best podman git && touch /etc/lima-bgp-labs
+    # Disable SELinux for lab testing (virtiofs mounts don't support relabeling)
+    setenforce 0 || true
+    sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
+
+- mode: user
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    # Configure rootless podman subuid/subgid if not already set
+    USER_NAME="$(whoami)"
+    if ! grep -q "^${USER_NAME}:" /etc/subuid 2>/dev/null; then
+      echo "${USER_NAME}:100000:65536" | sudo tee -a /etc/subuid
+      echo "${USER_NAME}:100000:65536" | sudo tee -a /etc/subgid
+    fi
+    # Start podman user socket
+    systemctl --user enable --now podman.socket 2>/dev/null || true
+
+probes:
+- script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    if ! timeout 30s bash -c "until command -v podman >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "podman is not installed yet"
+      exit 1
+    fi
+  hint: See "/var/log/cloud-init-output.log" in the guest
