@@ -1,15 +1,24 @@
 #!/usr/bin/env bash
-# Smoke test: clones bgp-labs and verifies lab01 behavioral assumptions.
-# Run inside a Lima VM via: limactl shell <vm> -- bash /path/to/smoke-test.sh
+# Smoke test: verifies lab01 behavioral assumptions.
+# Lima VM usage:  limactl shell <vm> -- bash /path/to/smoke-test.sh
+# CI usage:       REPO_ROOT=$GITHUB_WORKSPACE bash tests/integration/smoke-test.sh
 set -euo pipefail
 
 REPO_URL="https://github.com/jkirklan/bgp-labs.git"
-WORK_DIR="${HOME}/bgp-labs-smoke-$$"
 PASS=0
 FAIL=0
 
 pass() { echo "  PASS: $1"; PASS=$((PASS+1)); }
 fail() { echo "  FAIL: $1"; FAIL=$((FAIL+1)); }
+
+# When REPO_ROOT is set (CI), work in-place and skip clone/cleanup of the dir.
+if [ -n "${REPO_ROOT:-}" ]; then
+  WORK_DIR="${REPO_ROOT}"
+  CLONED=false
+else
+  WORK_DIR="${HOME}/bgp-labs-smoke-$$"
+  CLONED=true
+fi
 
 cleanup() {
   echo ""
@@ -17,7 +26,9 @@ cleanup() {
   cd "${WORK_DIR}" 2>/dev/null && {
     bash lab01-unreachable-network/teardown.sh 2>/dev/null || true
   }
-  rm -rf "${WORK_DIR}"
+  if [ "${CLONED}" = true ]; then
+    rm -rf "${WORK_DIR}"
+  fi
 }
 trap cleanup EXIT
 
@@ -26,9 +37,13 @@ echo "Host: $(uname -a)"
 echo "Podman: $(podman --version 2>/dev/null || echo unknown)"
 echo ""
 
-# ── Clone repo ───────────────────────────────────────────────────────────────
-echo "[1/5] Cloning repo..."
-git clone --depth=1 "${REPO_URL}" "${WORK_DIR}" 2>&1 | tail -3
+# ── Clone repo (skipped in CI) ────────────────────────────────────────────────
+if [ "${CLONED}" = true ]; then
+  echo "[1/5] Cloning repo..."
+  git clone --depth=1 "${REPO_URL}" "${WORK_DIR}" 2>&1 | tail -3
+else
+  echo "[1/5] Using existing checkout at ${WORK_DIR}"
+fi
 cd "${WORK_DIR}"
 
 # ── Lab 00: build FRR image ───────────────────────────────────────────────────
