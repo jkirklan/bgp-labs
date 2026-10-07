@@ -1,0 +1,18 @@
+{
+  "lab": "lab12-route-reflector",
+  "routers": [
+    {"name": "lab12-router-a",   "asn": 65001, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab12-router-b1",  "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab12-router-b2",  "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab12-router-b3",  "asn": 65002, "interfaces": ["eth0"]},
+    {"name": "lab12-router-rr",  "asn": 65002, "interfaces": ["eth0"]},
+    {"name": "lab12-router-c",   "asn": 65003, "interfaces": ["eth0", "eth1"]}
+  ],
+  "networks": [
+    {"name": "lab12-as1-as2-link", "subnet": "10.0.12.0/30",  "vni": null},
+    {"name": "lab12-as2-core",     "subnet": "10.0.20.0/24",  "vni": null},
+    {"name": "lab12-as2-as3-link", "subnet": "10.0.23.0/30",  "vni": null},
+    {"name": "lab12-as1-internal", "subnet": "192.168.1.0/24","vni": null},
+    {"name": "lab12-as3-internal", "subnet": "192.168.3.0/24","vni": null}
+  ]
+}
