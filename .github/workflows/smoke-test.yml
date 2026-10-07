@@ -9,6 +9,10 @@ on:
     # Weekly on Monday at 06:00 UTC — catches runner/image drift
     - cron: '0 6 * * 1'
 
+# Limit GITHUB_TOKEN to read-only to reduce blast radius.
+permissions:
+  contents: read
+
 jobs:
   smoke-ubuntu:
     name: Smoke (Ubuntu)
@@ -29,6 +33,9 @@ jobs:
 
   smoke-almalinux:
     name: Smoke (AlmaLinux 9 / kvm151)
+    # Only run on push to main and schedule — never on pull_request.
+    # A self-hosted runner should not execute untrusted PR code.
+    if: github.event_name == 'push' || github.event_name == 'schedule'
     runs-on: [self-hosted, almalinux9]
     timeout-minutes: 45
     steps:
