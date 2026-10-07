@@ -1,0 +1,16 @@
+{
+  "lab": "lab13-path-selection",
+  "routers": [
+    {"name": "lab13-router-a", "asn": 65001, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab13-router-b", "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab13-router-c", "asn": 65003, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab13-router-d", "asn": 65004, "interfaces": ["eth0", "eth1", "eth2"]}
+  ],
+  "networks": [
+    {"name": "lab13-a-b-link",     "subnet": "10.0.12.0/30",  "vni": null},
+    {"name": "lab13-a-c-link",     "subnet": "10.0.13.0/30",  "vni": null},
+    {"name": "lab13-b-d-link",     "subnet": "10.0.24.0/30",  "vni": null},
+    {"name": "lab13-c-d-link",     "subnet": "10.0.34.0/30",  "vni": null},
+    {"name": "lab13-as4-internal", "subnet": "192.168.4.0/24","vni": null}
+  ]
+}

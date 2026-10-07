@@ -30,6 +30,7 @@ ALL_LABS = [
     "lab10-microsegmentation",
     "lab11-ibgp-fullmesh",
     "lab12-route-reflector",
+    "lab13-path-selection",
 ]
 
 

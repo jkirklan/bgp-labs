@@ -27,6 +27,7 @@ cd labs/lab00-build-your-router && ./setup.sh
 | [Lab 10](lab10-microsegmentation/README.md) | Microsegmentation | VRF, dual-VNI, inter-VRF routing, tenant isolation |
 | [Lab 11](lab11-ibgp-fullmesh/README.md) | iBGP Full Mesh | iBGP, split-horizon rule, next-hop-self, full mesh |
 | [Lab 12](lab12-route-reflector/README.md) | Route Reflector | RR, route-reflector-client, ORIGINATOR_ID, CLUSTER_LIST |
+| [Lab 13](lab13-path-selection/README.md) | Path Selection | LOCAL_PREF, AS_PATH prepending, MED, decision process |
 
 ## Tools
 
