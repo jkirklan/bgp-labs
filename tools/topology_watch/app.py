@@ -45,7 +45,7 @@ def status():
     return jsonify(_poller.get_status())
 
 
-if __name__ == "__main__":
+def main() -> None:
     def _sigterm_handler(signum, frame):
         logger.info("Received SIGTERM, shutting down")
         sys.exit(0)
@@ -59,3 +59,7 @@ if __name__ == "__main__":
         logger.error("Lab config error: %s", e)
         sys.exit(1)
     app.run(host="127.0.0.1", port=8080)
+
+
+if __name__ == "__main__":
+    main()

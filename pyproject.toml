@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=70"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "bgp-labs"
@@ -12,14 +12,8 @@ dependencies = [
 ]
 
 [project.scripts]
-packet-watch = "labs.tools.packet_watch.packet_watch:main"
-
-[tool.setuptools.package-dir]
-"labs"                      = "."
-"labs.lib"                  = "lib"
-"labs.tools"                = "tools"
-"labs.tools.packet_watch"   = "tools/packet_watch"
-"labs.tools.topology_watch" = "tools/topology_watch"
+packet-watch   = "labs.tools.packet_watch.packet_watch:main"
+topology-watch = "labs.tools.topology_watch.app:main"
 
 [tool.setuptools]
 packages = [
@@ -29,6 +23,13 @@ packages = [
     "labs.tools.packet_watch",
     "labs.tools.topology_watch",
 ]
+
+[tool.setuptools.package-dir]
+"labs"                      = "."
+"labs.lib"                  = "lib"
+"labs.tools"                = "tools"
+"labs.tools.packet_watch"   = "tools/packet_watch"
+"labs.tools.topology_watch" = "tools/topology_watch"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
