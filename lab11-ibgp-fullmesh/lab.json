@@ -1,0 +1,16 @@
+{
+  "lab": "lab11-ibgp-fullmesh",
+  "routers": [
+    {"name": "lab11-router-a",  "asn": 65001, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab11-router-b1", "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab11-router-b2", "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab11-router-c",  "asn": 65003, "interfaces": ["eth0", "eth1"]}
+  ],
+  "networks": [
+    {"name": "lab11-as1-as2-link", "subnet": "10.0.12.0/30", "vni": null},
+    {"name": "lab11-b1-b2-link",   "subnet": "10.0.22.0/30", "vni": null},
+    {"name": "lab11-as2-as3-link", "subnet": "10.0.23.0/30", "vni": null},
+    {"name": "lab11-as1-internal", "subnet": "192.168.1.0/24", "vni": null},
+    {"name": "lab11-as3-internal", "subnet": "192.168.3.0/24", "vni": null}
+  ]
+}

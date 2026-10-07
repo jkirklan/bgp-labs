@@ -28,6 +28,7 @@ ALL_LABS = [
     "lab08-failover",
     "lab09-underlay-vs-overlay",
     "lab10-microsegmentation",
+    "lab11-ibgp-fullmesh",
 ]
 
 
