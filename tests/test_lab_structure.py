@@ -43,6 +43,7 @@ def test_lab_has_required_files(lab_dir):
     assert (path / "setup.sh").exists(), f"Missing setup.sh in {lab_dir}"
     assert (path / "teardown.sh").exists(), f"Missing teardown.sh in {lab_dir}"
     assert (path / "lab.json").exists(), f"Missing lab.json in {lab_dir}"
+    assert (path / "smoke.sh").exists(), f"Missing smoke.sh in {lab_dir}"
 
 
 @pytest.mark.parametrize("lab_dir", ALL_LABS)
@@ -66,6 +67,13 @@ def test_teardown_sh_valid_bash(lab_dir):
     path = LABS_ROOT / lab_dir / "teardown.sh"
     result = subprocess.run(["bash", "-n", str(path)], capture_output=True, text=True)
     assert result.returncode == 0, f"bash -n failed for {lab_dir}/teardown.sh:\n{result.stderr}"
+
+
+@pytest.mark.parametrize("lab_dir", ALL_LABS)
+def test_smoke_sh_valid_bash(lab_dir):
+    path = LABS_ROOT / lab_dir / "smoke.sh"
+    result = subprocess.run(["bash", "-n", str(path)], capture_output=True, text=True)
+    assert result.returncode == 0, f"bash -n failed for {lab_dir}/smoke.sh:\n{result.stderr}"
 
 
 @pytest.mark.parametrize("lab_dir", ALL_LABS)
