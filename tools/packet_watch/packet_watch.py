@@ -8,7 +8,7 @@ from rich.live import Live
 from labs.lib.lab_config import LabConfig, LabConfigError
 from labs.lib.podman_helper import get_bridge_iface, check_tshark, PodmanError
 from labs.tools.packet_watch.bgp_parser import parse_bgp_packet
-from labs.tools.packet_watch.vxlan_parser import parse_vxlan_packet
+from labs.tools.packet_watch.vxlan_parser import parse_vxlan_packet, UnderlayEvent
 from labs.tools.packet_watch.capture import start_capture
 from labs.tools.packet_watch.display import StandardDisplay, DualPaneDisplay
 
@@ -93,10 +93,14 @@ def _run_dual_pane(cfg, stop, no_keepalives):
             def on_bgp(pkt, link=net["name"]):
                 msg = parse_bgp_packet(pkt)
                 if msg:
-                    display.add_underlay(link,
-                        type("U", (), {"timestamp": msg.timestamp, "src_ip": msg.src_ip,
-                                       "dst_ip": msg.dst_ip, "vni": 0,
-                                       "inner_src_mac": "", "inner_dst_mac": ""})())
+                    display.add_underlay(link, UnderlayEvent(
+                        timestamp=msg.timestamp,
+                        src_ip=msg.src_ip,
+                        dst_ip=msg.dst_ip,
+                        vni=0,
+                        inner_src_mac="",
+                        inner_dst_mac="",
+                    ))
             t = threading.Thread(target=start_capture,
                                  args=(iface, "tcp port 179", [], on_bgp, stop), daemon=True)
         t.start()
