@@ -16,14 +16,22 @@ def start_capture(
 ):
     logger.debug("Starting capture on %s with filter %r (extra: %s)", iface, filter_expr, extra_args)
     cmd = ["tshark", "-i", iface, "-T", "json", "-l", "-f", filter_expr] + extra_args
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     def _watcher():
         stop_event.wait()
         proc.terminate()
 
+    def _stderr_reader():
+        for line in proc.stderr:
+            line = line.strip()
+            if line:
+                logger.warning("tshark [%s]: %s", iface, line)
+
     watcher = threading.Thread(target=_watcher, daemon=True)
     watcher.start()
+    stderr_thread = threading.Thread(target=_stderr_reader, daemon=True)
+    stderr_thread.start()
 
     buf = ""
     depth = 0
@@ -44,4 +52,6 @@ def start_capture(
     finally:
         proc.terminate()
         proc.wait()
+        if proc.returncode not in (0, -15):  # -15 = SIGTERM from terminate()
+            logger.warning("tshark exited with code %d on %s", proc.returncode, iface)
         logger.debug("Capture ended on %s", iface)
