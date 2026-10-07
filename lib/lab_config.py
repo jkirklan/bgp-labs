@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Any
 
 
 class LabConfigError(Exception):
@@ -7,12 +8,12 @@ class LabConfigError(Exception):
 
 
 class LabConfig:
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
         if not os.path.exists(path):
             raise LabConfigError(f"lab.json not found: {path}")
         try:
             with open(path) as f:
-                data = json.load(f)
+                data: dict[str, Any] = json.load(f)
         except json.JSONDecodeError as e:
             raise LabConfigError(f"Invalid JSON in {path}: {e}")
 
@@ -21,8 +22,8 @@ class LabConfig:
                 raise LabConfigError(f"Missing required key '{key}' in {path}")
 
         self.lab_name: str = data["lab"]
-        self.routers: list[dict] = data["routers"]
-        self.networks: list[dict] = data["networks"]
+        self.routers: list[dict[str, Any]] = data["routers"]
+        self.networks: list[dict[str, Any]] = data["networks"]
 
     @property
     def has_overlay(self) -> bool:
