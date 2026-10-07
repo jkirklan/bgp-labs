@@ -4,7 +4,7 @@ import threading
 from typing import Any
 
 from labs.lib.lab_config import LabConfig
-from labs.lib.podman_helper import PodmanError, run_ip_command, run_vtysh
+from labs.lib.podman_helper import run_ip_command, run_vtysh
 
 BGP_STATES = {"Idle", "Connect", "Active", "OpenSent", "OpenConfirm"}
 NEIGHBOR_RE = re.compile(

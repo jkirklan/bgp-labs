@@ -1,7 +1,9 @@
 import os
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from labs.lib.podman_helper import run_vtysh, get_bridge_iface, check_tshark, PodmanError
+
+from labs.lib.podman_helper import PodmanError, check_tshark, get_bridge_iface, run_vtysh
 
 FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures")
 VTYSH_SUMMARY = open(os.path.join(FIXTURES, "vtysh_bgp_summary.txt")).read()

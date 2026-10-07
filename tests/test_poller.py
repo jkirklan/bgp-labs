@@ -1,6 +1,8 @@
 import os
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from labs.lib.lab_config import LabConfig
 from labs.tools.topology_watch.poller import Poller
 

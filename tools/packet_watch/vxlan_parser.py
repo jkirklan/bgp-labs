@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 IP_PROTOCOLS = {"1": "ICMP", "6": "TCP", "17": "UDP", "89": "OSPF"}
 

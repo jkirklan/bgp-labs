@@ -1,9 +1,11 @@
 import time
+
 from rich.console import Console
 from rich.layout import Layout
 from rich.panel import Panel
+
 from labs.tools.packet_watch.bgp_parser import BgpMessage
-from labs.tools.packet_watch.vxlan_parser import UnderlayEvent, OverlayEvent
+from labs.tools.packet_watch.vxlan_parser import OverlayEvent, UnderlayEvent
 
 MSG_COLORS = {"OPEN": "bright_cyan", "UPDATE": "bright_green",
               "KEEPALIVE": "dim", "NOTIFICATION": "bright_red"}

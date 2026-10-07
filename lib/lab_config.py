@@ -15,7 +15,7 @@ class LabConfig:
             with open(path) as f:
                 data: dict[str, Any] = json.load(f)
         except json.JSONDecodeError as e:
-            raise LabConfigError(f"Invalid JSON in {path}: {e}")
+            raise LabConfigError(f"Invalid JSON in {path}: {e}") from e
 
         for key in ("lab", "routers", "networks"):
             if key not in data:

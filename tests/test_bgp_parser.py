@@ -1,7 +1,7 @@
 import json
 import os
-import pytest
-from labs.tools.packet_watch.bgp_parser import parse_bgp_packet, BgpMessage
+
+from labs.tools.packet_watch.bgp_parser import parse_bgp_packet
 
 FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures")
 

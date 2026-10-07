@@ -35,7 +35,7 @@ def get_bridge_iface(network_name: str) -> str:
         # legacy CNI format
         return net["plugins"][0]["bridge"]
     except (KeyError, IndexError, json.JSONDecodeError) as e:
-        raise PodmanError(f"Could not parse bridge interface for {network_name}: {e}")
+        raise PodmanError(f"Could not parse bridge interface for {network_name}: {e}") from e
 
 
 def run_ip_command(container: str, args: str) -> str:

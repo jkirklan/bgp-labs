@@ -1,7 +1,7 @@
 import json
 import os
-import pytest
-from labs.tools.packet_watch.vxlan_parser import parse_vxlan_packet, UnderlayEvent, OverlayEvent
+
+from labs.tools.packet_watch.vxlan_parser import OverlayEvent, UnderlayEvent, parse_vxlan_packet
 
 FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures")
 

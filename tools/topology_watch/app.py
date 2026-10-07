@@ -3,7 +3,9 @@ import logging
 import os
 import signal
 import sys
+
 from flask import Flask, jsonify, render_template
+
 from labs.lib.lab_config import LabConfig, LabConfigError
 from labs.tools.topology_watch.poller import Poller
 

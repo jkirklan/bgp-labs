@@ -2,8 +2,6 @@ import json
 import os
 import tempfile
 
-import pytest
-
 from labs.tools.topology_watch.poller import _parse_vxlan_links
 
 

@@ -3,14 +3,16 @@ import logging
 import os
 import sys
 import threading
+
 from rich.console import Console
 from rich.live import Live
+
 from labs.lib.lab_config import LabConfig, LabConfigError
-from labs.lib.podman_helper import get_bridge_iface, check_tshark, PodmanError
+from labs.lib.podman_helper import PodmanError, check_tshark, get_bridge_iface
 from labs.tools.packet_watch.bgp_parser import parse_bgp_packet
-from labs.tools.packet_watch.vxlan_parser import parse_vxlan_packet, UnderlayEvent
 from labs.tools.packet_watch.capture import start_capture
-from labs.tools.packet_watch.display import StandardDisplay, DualPaneDisplay
+from labs.tools.packet_watch.display import DualPaneDisplay, StandardDisplay
+from labs.tools.packet_watch.vxlan_parser import UnderlayEvent, parse_vxlan_packet
 
 logger = logging.getLogger(__name__)
 

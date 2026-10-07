@@ -1,5 +1,4 @@
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 
 def test_create_app_stops_poller_on_exit(tmp_path):

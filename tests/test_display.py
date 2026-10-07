@@ -1,6 +1,7 @@
-from labs.tools.packet_watch.bgp_parser import BgpMessage
-from labs.tools.packet_watch.display import format_bgp_row, StandardDisplay
 from unittest.mock import MagicMock
+
+from labs.tools.packet_watch.bgp_parser import BgpMessage
+from labs.tools.packet_watch.display import StandardDisplay, format_bgp_row
 
 
 def test_format_bgp_row_contains_required_fields():

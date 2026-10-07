@@ -1,7 +1,8 @@
 import io
 import threading
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from labs.tools.packet_watch.capture import start_capture
 
 _FIXTURES = Path(__file__).parent / "fixtures"

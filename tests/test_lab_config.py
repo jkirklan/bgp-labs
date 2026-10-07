@@ -1,6 +1,8 @@
 import json
 import os
+
 import pytest
+
 from labs.lib.lab_config import LabConfig, LabConfigError
 
 FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures")

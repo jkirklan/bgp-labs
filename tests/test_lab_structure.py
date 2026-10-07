@@ -1,6 +1,8 @@
 import subprocess
-import pytest
 from pathlib import Path
+
+import pytest
+
 from labs.lib.lab_config import LabConfig
 
 LABS_ROOT = Path(__file__).parent.parent.parent / "labs"
