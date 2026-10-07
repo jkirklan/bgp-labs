@@ -1,0 +1,12 @@
+{
+  "lab": "lab15-operational-bgp",
+  "routers": [
+    {"name": "lab15-router-a", "asn": 65001, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab15-router-b", "asn": 65002, "interfaces": ["eth0"]},
+    {"name": "lab15-router-c", "asn": 65003, "interfaces": ["eth0"]}
+  ],
+  "networks": [
+    {"name": "lab15-a-b-link", "subnet": "10.0.12.0/30", "vni": null},
+    {"name": "lab15-a-c-link", "subnet": "10.0.13.0/30", "vni": null}
+  ]
+}

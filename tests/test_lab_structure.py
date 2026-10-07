@@ -31,6 +31,7 @@ ALL_LABS = [
     "lab11-ibgp-fullmesh",
     "lab12-route-reflector",
     "lab13-path-selection",
+    "lab15-operational-bgp",
 ]
 
 
