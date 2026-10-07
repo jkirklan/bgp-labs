@@ -32,6 +32,7 @@ ALL_LABS = [
     "lab12-route-reflector",
     "lab13-path-selection",
     "lab15-operational-bgp",
+    "lab16-ipv6-bgp",
 ]
 
 

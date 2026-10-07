@@ -1,0 +1,12 @@
+{
+  "lab": "lab16-ipv6-bgp",
+  "routers": [
+    {"name": "lab16-router-a", "asn": 65001, "interfaces": ["eth0"]},
+    {"name": "lab16-router-b", "asn": 65002, "interfaces": ["eth0", "eth1"]},
+    {"name": "lab16-router-c", "asn": 65003, "interfaces": ["eth0"]}
+  ],
+  "networks": [
+    {"name": "lab16-a-b-link", "subnet": "10.0.12.0/30", "vni": null},
+    {"name": "lab16-b-c-link", "subnet": "10.0.23.0/30", "vni": null}
+  ]
+}
