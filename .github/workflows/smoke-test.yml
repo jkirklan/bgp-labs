@@ -5,14 +5,62 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # Weekly on Monday at 06:00 UTC — catches runner/image drift
+    - cron: '0 6 * * 1'
 
 jobs:
-  smoke-test:
+  smoke-ubuntu:
+    name: Smoke (Ubuntu)
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run smoke test
+      - name: Install Podman
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y podman
+
+      - name: Run full smoke suite
         env:
           REPO_ROOT: ${{ github.workspace }}
-        run: bash tests/integration/smoke-test.sh
+        run: bash tests/integration/smoke-all.sh
+
+  smoke-almalinux:
+    name: Smoke (AlmaLinux 9 / kvm151)
+    runs-on: [self-hosted, almalinux9]
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run full smoke suite
+        env:
+          REPO_ROOT: ${{ github.workspace }}
+        run: bash tests/integration/smoke-all.sh
+
+  smoke-macos:
+    name: Smoke (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Podman
+        run: brew install podman
+
+      - name: Start Podman machine
+        run: |
+          podman machine init --cpus 2 --memory 4096 --disk-size 20
+          podman machine start
+          # Wait for machine socket to be ready
+          for i in $(seq 1 30); do
+            podman info &>/dev/null && break
+            sleep 5
+          done
+          podman info
+
+      - name: Run full smoke suite
+        env:
+          REPO_ROOT: ${{ github.workspace }}
+        run: bash tests/integration/smoke-all.sh
