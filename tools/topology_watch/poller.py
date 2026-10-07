@@ -1,3 +1,4 @@
+import logging
 import re
 import threading
 from typing import Any
@@ -9,6 +10,8 @@ BGP_STATES = {"Idle", "Connect", "Active", "OpenSent", "OpenConfirm"}
 NEIGHBOR_RE = re.compile(
     r"^(\d+\.\d+\.\d+\.\d+)\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\S+\s+(\S+)"
 )
+
+logger = logging.getLogger(__name__)
 
 _NeighborStatus = dict[str, str | int]  # {"state": str, "prefixes_received": int}
 
@@ -25,11 +28,14 @@ class Poller:
         self._thread: threading.Thread | None = None
 
     def start(self) -> None:
+        logger.info("Poller starting (interval=%.1fs, routers=%d)",
+                    self._interval, len(self._config.routers))
         self._stop.clear()
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
 
     def stop(self) -> None:
+        logger.info("Poller stopping")
         self._stop.set()
         if self._thread:
             self._thread.join(timeout=5)
@@ -51,15 +57,16 @@ class Poller:
             try:
                 output = run_vtysh(name, "show bgp summary")
                 bgp: dict[str, _NeighborStatus] = _parse_bgp_summary(output)
-            except Exception:
+            except Exception as e:
+                logger.warning("BGP poll failed for %s: %s", name, e)
                 bgp = {}
             vxlan: dict[str, str] = {}
             if self._config.has_overlay:
                 try:
                     output = run_ip_command(name, "-br link show type vxlan")
                     vxlan = _parse_vxlan_links(output)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning("VXLAN poll failed for %s: %s", name, e)
             with self._lock:
                 self._status[name] = {"bgp": bgp, "vxlan": vxlan}
 

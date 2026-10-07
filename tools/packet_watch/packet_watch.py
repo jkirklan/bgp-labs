@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import sys
 import threading
@@ -11,6 +12,8 @@ from labs.tools.packet_watch.vxlan_parser import parse_vxlan_packet
 from labs.tools.packet_watch.capture import start_capture
 from labs.tools.packet_watch.display import StandardDisplay, DualPaneDisplay
 
+logger = logging.getLogger(__name__)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Live BGP/VXLAN packet viewer")
@@ -22,7 +25,7 @@ def main():
     try:
         check_tshark()
     except RuntimeError as e:
-        print(str(e), file=sys.stderr)
+        logger.error("tshark not available: %s", e)
         print("packet-watch disabled — topology-watch still available.", file=sys.stderr)
         sys.exit(0)
 
@@ -30,7 +33,7 @@ def main():
     try:
         cfg = LabConfig(lab_json)
     except LabConfigError as e:
-        print(f"Error: {e}", file=sys.stderr)
+        logger.error("Lab config error: %s", e)
         sys.exit(1)
 
     stop = threading.Event()
