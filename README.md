@@ -37,7 +37,7 @@ Each lab starts topology-watch (topology diagram) and packet-watch (live BGP mes
 
 | Tool | Port | Description |
 |------|------|-------------|
-| topology-watch | 8300–8310 | Live topology diagram (Lab 00 = 8300, Lab 01 = 8301, …) |
+| topology-watch | 8300–8399 | Live topology diagram (Lab 00 = 8300, Lab 01 = 8301, …) |
 | packet-watch | — | Terminal BGP/VXLAN packet viewer (requires tshark) |
 
 ## Reference Docs
