@@ -12,11 +12,22 @@
 
 **Microsegmentation** means isolating traffic at both L2 and L3 so that one tenant cannot reach another's resources, even if they share the same physical infrastructure.
 
-**VNI (VXLAN Network Identifier)** creates L2 isolation: packets in VNI 1001 never appear in VNI 1002's broadcast domain. Hosts on different VNIs can't ARP each other — they're on different virtual L2 segments.
+**VNI (VXLAN Network Identifier)** is the 24-bit "virtual LAN ID" inside a VXLAN tunnel. VXLAN (Virtual Extensible LAN) wraps an entire Ethernet frame — including the original MAC header — inside a UDP packet, letting you extend a Layer 2 broadcast domain across a Layer 3 network. The VNI is stamped in the 8-byte VXLAN header before the inner Ethernet frame:
 
-**VRF (Virtual Routing and Forwarding)** creates L3 isolation: each VRF has its own routing table. A route in `Tenant-A`'s table is invisible to `Tenant-B`'s table, even on the same physical device.
+```
+Outer IP/UDP | VXLAN Header (VNI) | Inner Ethernet | Inner IP | Payload
+```
 
-**The gap VNIs leave open:** VNIs isolate broadcast domains (L2). But if the VTEP's main routing table contains routes for both tenants, an attacker with routing access to the VTEP can potentially reach both tenant subnets. VRFs close this gap by making the L3 routing tables completely separate.
+Because the 24-bit VNI field allows ~16 million unique values (vs. VLAN's 4096), large multi-tenant environments use one VNI per tenant segment. Two hosts in different VNIs cannot ARP each other: their broadcast traffic never crosses VNI boundaries. The VTEP (tunnel endpoint) decapsulates incoming VXLAN packets, reads the VNI, and only bridges the inner frame into the matching VNI segment. L2 isolation is enforced at the VTEP — not by firewalls.
+
+**VRF (Virtual Routing and Forwarding)** is a Linux kernel feature that creates multiple independent L3 routing tables on the same device. Each VRF is a network namespace-like container for routes: a route installed into VRF `Tenant-A` (table 100) is completely invisible when you look up destinations in VRF `Tenant-B` (table 101), even on the same host. In Linux, VRFs are implemented as a special link type (`ip link add Tenant-A type vrf table 100`). You "enslave" interfaces to a VRF master (`ip link set vxlan0 master Tenant-A`), which makes the kernel route all traffic from that interface using only that VRF's table. `ip vrf exec Tenant-A <command>` launches a process inside a specific VRF context — its route lookups use only that VRF's table.
+
+Key consequences:
+- A process in VRF `Tenant-A` cannot reach `Tenant-B`'s subnets unless an explicit route is leaked across VRFs.
+- The "main" routing table (table 254) is separate from all VRFs — interfaces enslaved to a VRF leave the main table.
+- Enslaving an interface to a VRF removes its IP address in Linux; you must re-add it afterward.
+
+**The gap VNIs leave open:** VNIs isolate broadcast domains (L2). But if the VTEP's main routing table contains routes for both tenants, any process on the VTEP can reach both tenant subnets via normal IP forwarding — the VTEP itself acts as an unwanted router between tenants. VRFs close this gap by placing each tenant's routes in a separate table that other tenants cannot see or use.
 
 ```
 UNDERLAY:  [vtep-a]──10.0.12.0/30──[vtep-b]
