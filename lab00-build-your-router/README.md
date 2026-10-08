@@ -138,6 +138,15 @@ The second pattern is how the debug container works throughout these labs.
 The `--network container:X` flag does not create a new namespace — it joins X's.
 
 **See namespaces on your host:**
+
+> **macOS note:** `ip` is a Linux command. On macOS, containers run inside a Linux VM
+> (Podman Machine). To run `ip` commands, SSH into the machine first:
+> ```bash
+> podman machine ssh
+> # Now you're inside the Linux VM — run ip commands here
+> sudo ip netns list
+> ```
+
 ```bash
 # List all network namespaces (requires root or sudo)
 sudo ip netns list
@@ -151,12 +160,15 @@ sudo ip netns exec <ns-id> ip route show
 When two containers share a Podman network (`lab03-as1-as2-link`), Linux creates a
 veth pair — a virtual Ethernet cable with one end in each namespace. The Podman bridge
 (`br-xxxx` visible on your host via `ip link show type bridge`) connects all the veth
-ends on the host side. Run this on your host after any `./setup.sh` to see it:
+ends on the host side. After any `./setup.sh`, run these to see the plumbing:
 
 ```bash
 ip link show type bridge
 ip link show type veth
 ```
+
+> **macOS:** run the above inside `podman machine ssh` — they won't work in your
+> Mac terminal directly.
 
 You'll see one bridge per Podman network and one veth pair per container-network attachment.
 
