@@ -99,6 +99,47 @@ RIB — Routing Information Base). FRR installs its selected routes into the ker
 so both views should match. FRR's view adds extra context: how the route was learned
 (C/S/B), administrative distance, and age — see [Route Source Codes](../docs/04-reference/routing-source-codes.md).
 
+### ARP — Address Resolution Protocol
+
+IP addresses are logical — they exist in software. To actually deliver a frame on a
+local network, the sender needs the destination's **MAC address** (the hardware address
+burned into the network interface). **ARP** (Address Resolution Protocol) is how a host
+discovers that mapping.
+
+When host-a wants to send a packet to 192.168.101.254 (the router) for the first time:
+
+1. host-a broadcasts on the network: *"Who has 192.168.101.254? Tell 192.168.101.10"*
+2. The router sees the broadcast, recognizes its own IP, and replies: *"192.168.101.254 is at aa:bb:cc:dd:ee:ff"*
+3. host-a caches that mapping in its **ARP table** and uses the MAC for all subsequent frames
+
+ARP only works within the same subnet — it uses broadcast, which doesn't cross router
+boundaries. This is exactly why hosts on different subnets *must* go through a router:
+host-a cannot ARP for host-b's MAC across subnets, so it ARPs for the *router's* MAC
+instead and sends the packet there.
+
+View the ARP table (neighbor cache) on a running container:
+
+```bash
+podman exec lab01-host-a ip neigh show
+```
+
+Example output after a successful ping:
+
+```
+192.168.101.254 dev eth0 lladdr aa:bb:cc:dd:ee:ff REACHABLE
+```
+
+| Field | Meaning |
+|-------|---------|
+| `192.168.101.254` | The IP address of the neighbor |
+| `dev eth0` | Learned via this interface |
+| `lladdr aa:bb:cc:dd:ee:ff` | The MAC address that owns this IP |
+| `REACHABLE` | The entry was recently confirmed; `STALE` means it hasn't been used recently and will be re-verified on next use; `FAILED` means ARP got no response |
+
+If a host is unreachable on the same subnet, an empty or `FAILED` ARP entry is usually
+the first thing to check — it tells you whether the problem is at Layer 2 (ARP/MAC)
+or Layer 3 (routing).
+
 Every network interface belongs to a subnet — a broadcast domain where hosts
 communicate directly using ARP. When a packet's destination is in a *different*
 subnet, the sender must forward it to a **router** that has a path to that subnet.
