@@ -15,7 +15,7 @@ A **network interface** is a logical attachment point to a network — either ph
 
 - A **name** (`eth0`, `lo`, `vxlan0`, …)
 - A **MAC address** — a hardware-level identifier unique to that interface
-- One or more **IP addresses** with a **prefix length** (e.g., `/24`)
+- One or more **IP addresses** with a **[prefix length](../docs/04-reference/subnets-and-cidr.md)** (e.g., `/24`)
 - A **state** — UP (active) or DOWN
 
 Inspect all interfaces inside a running container with:
