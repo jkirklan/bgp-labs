@@ -59,12 +59,6 @@ Both hosts share one Podman network. ARP resolves directly — no router involve
 
 **Part 2 — L3: different subnets, router required**
 
-```
-lab02-host-a1 (192.168.10.10) ──┐
-                                  ├── lab02-vlan10 ──── lab02-router-a ──── lab02-vlan20 ──── lab02-host-b1 (192.168.20.10)
-lab02-host-a2 (192.168.10.11) ──┘     192.168.10.0/24   .254  .254    192.168.20.0/24
-```
-
 `host-a1` and `host-b1` are on different subnets. Traffic must hop through `router-a`.
 
 ```mermaid
