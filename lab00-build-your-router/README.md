@@ -96,6 +96,17 @@ Because the runtime image has no shell, you interact with running routers throug
 
 ## Linux Network Namespaces
 
+[Namespaces](https://en.wikipedia.org/wiki/Linux_namespaces) are a Linux kernel feature
+(alongside **cgroups**) that make containers possible. Namespaces partition kernel
+resources so that one group of processes sees one set of resources while another group
+sees a different set — each group believing it has its own isolated view of the system.
+cgroups complement this by controlling *how much* of a resource (CPU, memory, I/O) a
+group can use. Together they are the two foundational building blocks of every container
+runtime, including Podman and Docker.
+
+There are several namespace types in the Linux kernel (mount, PID, UTS, IPC, user, time)
+but the most visible in these labs is the **network namespace**.
+
 Every Podman container runs in its own **network namespace** — an isolated copy of the
 Linux network stack with its own interfaces, routing table, ARP cache, and firewall rules.
 This is what makes containers feel like separate machines on a network.
