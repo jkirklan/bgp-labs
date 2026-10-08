@@ -67,6 +67,94 @@ The two notations are equivalent:
 per router end, network address, broadcast. `/32` is a host route — it matches exactly
 one IP and has no broadcast or network address.
 
+## Calculating subnet mask from prefix length
+
+A subnet mask is always a block of consecutive `1` bits followed by consecutive `0` bits.
+The prefix length tells you how many `1` bits to use. Each octet is 8 bits.
+
+Example: `/26`
+
+```
+26 one-bits:  11111111.11111111.11111111.11000000
+              └── 8 ──┘└── 8 ──┘└── 8 ──┘└─ 6 ──┘
+dotted-decimal:  255    .  255    .  255    .  192
+```
+
+The last octet has 6 one-bits: `11000000` = 128 + 64 = **192**.
+
+Each dotted-decimal octet is just 8 bits converted to decimal:
+
+| Binary | Decimal |
+|--------|---------|
+| 10000000 | 128 |
+| 11000000 | 192 |
+| 11100000 | 224 |
+| 11110000 | 240 |
+| 11111000 | 248 |
+| 11111100 | 252 |
+| 11111110 | 254 |
+| 11111111 | 255 |
+
+## Calculating network address, broadcast, and host range
+
+Given an IP address and a subnet mask, three bitwise operations yield everything you need.
+
+**Step 1 — Network address: bitwise AND of IP and mask**
+
+The AND operation keeps only the bits that are `1` in *both* the IP and the mask. This zeros
+out all host bits, leaving the network address.
+
+```
+IP:       192.168.10.25  →  11000000.10101000.00001010.00011001
+Mask /24: 255.255.255.0  →  11111111.11111111.11111111.00000000
+AND:                        ────────────────────────────────────
+Network:  192.168.10.0   →  11000000.10101000.00001010.00000000
+```
+
+**Step 2 — Broadcast address: bitwise OR of network address and inverted mask**
+
+Inverting the mask flips all `1`s to `0`s and `0`s to `1`s — this is the *host mask*.
+OR-ing it with the network address sets all host bits to `1`, giving the broadcast address.
+
+```
+Network:      192.168.10.0   →  11000000.10101000.00001010.00000000
+Inverted mask (host mask):   →  00000000.00000000.00000000.11111111
+OR:                             ────────────────────────────────────
+Broadcast:    192.168.10.255 →  11000000.10101000.00001010.11111111
+```
+
+**Step 3 — Usable host range and count**
+
+```
+First host = network address + 1  →  192.168.10.1
+Last host  = broadcast - 1        →  192.168.10.254
+Count      = 2^(host bits) - 2    →  2^8 - 2 = 254
+```
+
+The `-2` subtracts the network address and the broadcast address, which cannot be
+assigned to hosts.
+
+### Worked example: 10.0.12.1/30
+
+```
+Prefix length:  /30  →  30 one-bits  →  255.255.255.252
+
+IP:        10.0.12.1    →  00001010.00000000.00001100.00000001
+Mask /30:  255.255.255.252 → 11111111.11111111.11111111.11111100
+AND →
+Network:   10.0.12.0    →  00001010.00000000.00001100.00000000
+
+Inverted mask:           →  00000000.00000000.00000000.00000011
+OR with network →
+Broadcast: 10.0.12.3    →  00001010.00000000.00001100.00000011
+
+Host bits: 32 - 30 = 2
+Usable hosts: 2^2 - 2 = 2  (10.0.12.1 and 10.0.12.2)
+```
+
+This is why `/30` is used for point-to-point links — exactly two usable addresses, one
+per router end.
+
 ## Reading an IP address in context
 
 ```
