@@ -31,17 +31,6 @@ This is the fundamental "customer vs. peer" model used by every ISP.
 
 ## Topology
 
-```
-[AS65001 lab07-cust-a]──10.0.10.0/30──┐
-                                        ├──[AS65000 lab07-transit]──10.0.30.0/30──[AS65003 lab07-peer]
-[AS65002 lab07-cust-b]──10.0.20.0/30──┘
-
-transit: eth0=10.0.10.1, eth1=10.0.20.1, eth2=10.0.30.1
-cust-a:  eth0=10.0.10.2, advertises 172.16.1.0/24
-cust-b:  eth0=10.0.20.2, advertises 172.16.2.0/24
-peer:    eth0=10.0.30.2, advertises 172.16.3.0/24
-```
-
 ```mermaid
 graph LR
     CA["AS65001<br>lab07-cust-a<br>172.16.1.0/24"]  <-->|"10.0.10.0/30"| T["AS65000<br>lab07-transit"]

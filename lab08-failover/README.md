@@ -38,16 +38,6 @@ BFD (Bidirectional Forwarding Detection) can detect failures in sub-second time.
 
 ## Topology
 
-```
-[lab08-customer AS65001]──10.0.12.0/30──[lab08-isp-primary AS65002]
-         │
-         └─10.0.13.0/30──[lab08-isp-backup AS65003]
-
-customer: eth0=10.0.12.1 (primary), eth1=10.0.13.1 (backup)
-isp-primary: eth0=10.0.12.2, advertises 0.0.0.0/0
-isp-backup:  eth0=10.0.13.2, advertises 0.0.0.0/0
-```
-
 ```mermaid
 graph LR
     C["AS65001<br>lab08-customer<br>192.168.100.1/24"]  <-->|"10.0.12.0/30<br>(primary)"| P["AS65002<br>lab08-isp-primary"]

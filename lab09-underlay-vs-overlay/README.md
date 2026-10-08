@@ -22,18 +22,6 @@ outer IP from 10.0.12.1 to 10.0.12.2 → UDP port 4789 → VNI 1001 → inner IP
 
 ## Topology
 
-```
-OVERLAY VIEW:
-[vtep-a: 192.168.10.1]───────────── VNI 1001 ─────────────[vtep-b: 192.168.10.2]
-          (same logical /24 segment — no routing hop visible to overlay traffic)
-
-UNDERLAY VIEW:
-[lab09-vtep-a AS65001]──lab09-underlay (10.0.12.0/30)──[lab09-vtep-b AS65002]
-     10.0.12.1                                               10.0.12.2
-
-VXLAN:  VNI 1001  |  outer src/dst: 10.0.12.1 ↔ 10.0.12.2  |  UDP/4789
-```
-
 ```mermaid
 graph LR
     A["AS65001 lab09-vtep-a<br>underlay: 10.0.12.1<br>overlay: 192.168.10.1"]

@@ -44,16 +44,6 @@ requirements, and route reflectors.
 
 ## Topology
 
-```
-[AS65001]──10.0.12.0/30──[AS65002 transit]──10.0.23.0/30──[AS65003]
-lab04-router-a            lab04-router-b                   lab04-router-c
-192.168.1.0/24                                              192.168.3.0/24
-
-router-a: eth0=10.0.12.1/30, eth1=192.168.1.1/24
-router-b: eth0=10.0.12.2/30, eth1=10.0.23.1/30
-router-c: eth0=10.0.23.2/30, eth1=192.168.3.1/24
-```
-
 ```mermaid
 graph LR
     A["AS65001<br>lab04-router-a<br>192.168.1.0/24"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab04-router-b<br>(transit)"]

@@ -36,18 +36,6 @@ This asks the peer to resend its UPDATE messages without dropping the session.
 
 ## Topology
 
-```
-[AS65001 lab06-router-a]──10.0.12.0/30──[AS65002 lab06-router-b]──10.0.23.0/30──[AS65003 lab06-router-c]
- advertises:                              (ISP, filters inbound)                   (downstream peer)
-  192.168.1.0/24
-  192.168.2.0/24
-  10.0.0.0/8  ← should be filtered
-
-router-a: eth0=10.0.12.1/30
-router-b: eth0=10.0.12.2/30, eth1=10.0.23.1/30
-router-c: eth0=10.0.23.2/30
-```
-
 ```mermaid
 graph LR
     A["AS65001<br>lab06-router-a<br>advertises 3 prefixes"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab06-router-b<br>(ISP, filters inbound)"]

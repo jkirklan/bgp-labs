@@ -49,19 +49,6 @@ and LOCAL_PREF (Exercise 3).
 
 ## Topology
 
-```
-           [AS65001 lab05-router-a] 192.168.1.0/24
-           /10.0.12.0/30  \10.0.13.0/30
-[AS65002 lab05-router-b]  [AS65003 lab05-router-c]
-           \10.0.24.0/30  /10.0.34.0/30
-           [AS65004 lab05-router-d]
-
-router-a: eth0=10.0.12.1/30, eth1=10.0.13.1/30
-router-b: eth0=10.0.12.2/30, eth1=10.0.24.1/30
-router-c: eth0=10.0.13.2/30, eth1=10.0.34.1/30
-router-d: eth0=10.0.24.2/30, eth1=10.0.34.2/30
-```
-
 ```mermaid
 graph TD
     A["AS65001<br>lab05-router-a<br>192.168.1.0/24"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab05-router-b"]
