@@ -243,6 +243,7 @@ podman rm -f test-router
 ```bash
 podman network create --subnet 10.99.0.0/24 test-net
 podman run --rm -it \
+  --cap-add NET_RAW \
   --network test-net \
   docker.io/nicolaka/netshoot bash
 # Inside: ip addr, ping 10.99.0.1, exit
