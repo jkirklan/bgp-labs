@@ -182,9 +182,10 @@ The lab uses isolated internal networks (no bridge gateway), so host-a has only 
 connected route. There is no default route. This is intentional — it mirrors how
 real networks behave when routers aren't configured to forward traffic.
 
-**Exercise 2: Add static routes**
+**Exercise 2: Add only the forward route — and watch it still fail**
 
-On lab01-host-a, add a route for the 192.168.102.0/24 network via lab01-router-a:
+Add a route on host-a so it knows how to reach host-b's network:
+
 ```bash
 podman exec -i lab01-host-a vtysh << 'EOF'
 configure terminal
@@ -194,7 +195,30 @@ write memory
 EOF
 ```
 
-On lab01-host-b, add a return route:
+Confirm the route is installed:
+
+```bash
+podman exec -it lab01-host-a vtysh -c "show ip route"
+# Should now show: S>* 192.168.102.0/24 [1/0] via 192.168.101.254
+```
+
+Now ping again:
+
+```bash
+podman exec lab01-host-a ping -c 5 192.168.102.10
+```
+
+Expected: still no reply. host-a now knows how to *send* to host-b, but host-b has no
+route back to `192.168.101.0/24`. The ICMP reply reaches the router, then gets dropped —
+host-b doesn't know where to send a packet destined for 192.168.101.10.
+
+This is the most common real-world mistake: the forward path works but the return path
+doesn't, so the connection appears broken from both ends.
+
+**Exercise 3: Add the return route — and watch it succeed**
+
+Add the return route on host-b:
+
 ```bash
 podman exec -i lab01-host-b vtysh << 'EOF'
 configure terminal
@@ -204,13 +228,13 @@ write memory
 EOF
 ```
 
-**Exercise 3: Verify reachability**
+Now ping again:
 
 ```bash
 podman exec lab01-host-a ping -c 5 192.168.102.10
 ```
 
-Expected: `!!!!!` (5 successful pings). Watch packet-watch show the ICMP traffic.
+Expected: `!!!!!` (5 successful pings). Both halves of the path are now in place.
 
 **Exercise 4: Think about scale**
 
