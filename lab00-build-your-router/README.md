@@ -65,10 +65,31 @@ FRR (Free Range Routing) is an open-source routing daemon suite that implements 
 OSPF, IS-IS, and other protocols. In these labs, each "router" is an FRR container
 connected to Podman networks that act as point-to-point or broadcast links.
 
-The FRR image is built from a Hummingbird `core-runtime` base — a distroless image
-with no shell, no package manager, and no unnecessary binaries. The multi-stage build
-installs FRR in a builder stage, then copies only the required binaries and libraries
-into the final image. This keeps the attack surface minimal and the image small.
+The FRR image is built on an AlmaLinux 9 base — FRR's EPEL packages require the
+CodeReady Builder (CRB) repository, which is only available on full AlmaLinux/RHEL,
+not on stripped-down UBI images.
+
+### What is Hummingbird?
+
+[Hummingbird](https://hummingbird-project.io/) is a project that publishes minimal,
+distroless OCI container images for production use. A distroless image contains only
+the application runtime (e.g., Python, Node.js, Go) and its library dependencies —
+no shell, no package manager, no cron, no debugging tools. The attack surface is
+dramatically reduced: there is nothing for an attacker to execute if they gain code
+execution inside the container.
+
+The multi-stage build pattern you see in `containerfiles/frr/Containerfile` is the
+standard way to work with distroless bases:
+
+1. **Builder stage** — a full OS image (AlmaLinux, UBI) with `dnf`, `gcc`, etc.
+   Install packages, compile, run `npm install`, whatever the build needs.
+2. **Runtime stage** — a minimal base (distroless or stripped). `COPY --from=build`
+   pulls only the compiled output and runtime libraries. The build tools never make it
+   into the shipped image.
+
+Hummingbird provides both flavors: `default` (distroless runtime) and `builder`
+(builder-stage base with bash and dnf). You can browse the full catalog and inspect
+SBOMs and CVE scans at **https://hummingbird-project.io/**.
 
 Because the runtime image has no shell, you interact with running routers through
 `vtysh` (FRR's CLI) via `podman exec`.
