@@ -123,22 +123,60 @@ BGP is unique among routing protocols in using TCP rather than a raw IP or UDP
 transport — TCP's reliability guarantees that UPDATE messages are delivered in order
 and without loss.
 
-## VXLAN — Tunneling L2 over L3
+## Overlay Tunneling Protocols
 
-VXLAN (Virtual eXtensible LAN) is a good example of **layer encapsulation**: it takes
-an L2 Ethernet frame and wraps it inside a UDP/IP packet so it can travel across an L3
-network. The inner frame is the tenant's traffic; the outer IP/UDP headers are the
-underlay transport.
+Overlay protocols take traffic from one layer and wrap it inside another layer's
+headers so it can travel across a different kind of network. The inner traffic is the
+tenant's payload; the outer headers are the underlay transport.
+
+### VXLAN — L2 over UDP/IP
+
+VXLAN (Virtual eXtensible LAN) takes an L2 Ethernet frame and wraps it inside a
+UDP/IP packet so it can travel across an L3 network.
 
 ```
 Outer:  Ethernet (L2) → IP (L3) → UDP port 4789 (L4) → VXLAN header (VNI)
 Inner:  Ethernet frame (L2) → IP packet (L3) → TCP/UDP (L4) → Application (L7)
 ```
 
-This is called an **overlay** network — it creates a virtual L2 segment stretched
-across an L3 underlay. From the tenant's perspective, two containers in the same
-VXLAN VNI appear to be on the same Ethernet segment, even if they're on different
-physical hosts separated by routers.
+Key properties:
+- **VNI** (VXLAN Network Identifier) — 24-bit segment ID; up to 16 million virtual segments
+- **Multicast or unicast** underlay — VTEPs (tunnel endpoints) learn each other's addresses
+  via BGP EVPN (as in Labs 09–10 and 14) or flood-and-learn
+- **Stateless** — no connection setup; each packet is independently encapsulated
+
+### Geneve — Extensible Overlay Encapsulation
+
+Geneve (Generic Network Virtualization Encapsulation, RFC 8926) is a newer overlay
+protocol designed to supersede VXLAN, NVGRE, and STT. It uses the same UDP transport
+as VXLAN but adds a **variable-length options header** for carrying arbitrary metadata.
+
+```
+Outer:  Ethernet (L2) → IP (L3) → UDP port 6081 (L4) → Geneve header (VNI + options)
+Inner:  Ethernet frame (L2) → IP packet (L3) → TCP/UDP (L4) → Application (L7)
+```
+
+Key properties:
+- **VNI** — same 24-bit virtual network identifier as VXLAN
+- **Options header** — TLV (type-length-value) fields let the control plane attach
+  metadata to each packet: policy tags, flow IDs, timestamps
+- **Used by** Open vSwitch (OVN), Kubernetes network plugins (Antrea, Cilium with
+  Geneve backend), and some cloud provider fabrics
+- **Wire-compatible** with VXLAN when no options are present — same outer structure
+  minus the options; a VXLAN VTEP and a Geneve VTEP cannot interoperate directly
+
+**VXLAN vs. Geneve at a glance:**
+
+| | VXLAN | Geneve |
+|---|---|---|
+| UDP port | 4789 | 6081 |
+| Header size | Fixed (8 bytes) | Variable (min 8 bytes + options) |
+| Metadata | None | Arbitrary TLV options |
+| Adoption | Ubiquitous | Growing (OVN, Cilium) |
+
+Both protocols create an **overlay** network — from the tenant's perspective, two
+containers in the same VNI appear to be on the same Ethernet segment, even if they're
+on different physical hosts separated by routers.
 
 ## Layer summary for these labs
 
@@ -152,5 +190,6 @@ physical hosts separated by routers.
 | ICMP / ping | L3 | Reachability testing |
 | BGP route exchange | L7 over L4/L3/L2 | Dynamic distribution of L3 routing information |
 | VXLAN encapsulation | L2-in-L4/L3 | Overlay — stretch L2 segments across L3 fabric |
+| Geneve encapsulation | L2-in-L4/L3 | Extensible overlay — same as VXLAN plus metadata options |
 | VRF | L3 | Multiple isolated routing tables on one router |
 | TCP port 179 (BGP) | L4 | Transport session for BGP messages |
