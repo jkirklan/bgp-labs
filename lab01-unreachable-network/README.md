@@ -101,6 +101,10 @@ so both views should match. FRR's view adds extra context: how the route was lea
 
 ### ARP — Address Resolution Protocol
 
+> ARP operates at **Layer 2** (Data Link). IP routing operates at **Layer 3** (Network).
+> See [Network Layers](../docs/04-reference/network-layers.md) for a full breakdown of
+> where each concept in these labs sits in the stack.
+
 IP addresses are logical — they exist in software. To actually deliver a frame on a
 local network, the sender needs the destination's **MAC address** (the hardware address
 burned into the network interface). **ARP** (Address Resolution Protocol) is how a host

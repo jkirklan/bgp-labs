@@ -43,6 +43,8 @@ Each lab starts topology-watch (topology diagram) and packet-watch (live BGP mes
 
 ## Reference Docs
 
+- [Network Layers](docs/04-reference/network-layers.md) — OSI model, L2/L3/L4/L7, where ARP/IP/BGP/VXLAN/VRF each sit
+- [Subnets and CIDR](docs/04-reference/subnets-and-cidr.md) — subnet masks, prefix lengths, network/broadcast calculation
 - [L2 vs L3 Networking](docs/04-reference/l2-vs-l3-networking.md) — MAC addresses, ARP, broadcast domains, why L2 can't span subnets
 - [Route Source Codes](docs/04-reference/routing-source-codes.md) — K, C, S, B flags in `show ip route`
 - [Administrative Distance and Metric](docs/04-reference/routing-ad-metric.md) — what `[AD/metric]` means
