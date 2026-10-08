@@ -50,10 +50,9 @@ vlan10 hosts; its eth1 is the gateway for vlan20 hosts.
 
 **Part 1 — L2: same broadcast domain, no router needed**
 
-```
-lab02-host-a1 (192.168.10.10) ──┐
-                                  ├── lab02-vlan10 (192.168.10.0/24)
-lab02-host-a2 (192.168.10.11) ──┘
+```mermaid
+graph LR
+    A1["lab02-host-a1<br>192.168.10.10/24"] <-->|"lab02-vlan10<br>192.168.10.0/24"| A2["lab02-host-a2<br>192.168.10.11/24"]
 ```
 
 Both hosts share one Podman network. ARP resolves directly — no router involved.
