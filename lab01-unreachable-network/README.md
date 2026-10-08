@@ -262,9 +262,26 @@ podman exec lab01-host-a ping -c 5 192.168.102.10
 **`write memory` warns "Error renaming frr.conf.sav: Device or resource busy":**
 Harmless. FRR cannot rename the bind-mounted config file before rewriting it, but the config is written and routes are installed correctly. The `[OK]` line confirms success.
 
-**Ping still fails after adding static routes:**
-Check that both hosts have the return route. lab01-host-a → lab01-host-b works
-(host-a has the route), but the reply can't get back without a route on host-b.
+**Ping still fails after adding static routes — packets leave but nothing comes back:**
+This is the classic asymmetric routing trap. The forward path works but the return path
+doesn't, so ping appears completely broken even though half the job is done.
+
+Check each host's routing table:
+
+```bash
+podman exec -it lab01-host-a vtysh -c "show ip route"
+podman exec -it lab01-host-b vtysh -c "show ip route"
+```
+
+Each host needs a route pointing toward the *other* host's subnet:
+
+- host-a must have `192.168.102.0/24 via 192.168.101.254`
+- host-b must have `192.168.101.0/24 via 192.168.102.254`
+
+If one is missing, the sender's packets arrive at the destination just fine — but the
+reply gets dropped because the replying host has no route back. tcpdump on the receiver
+will show the ICMP echo request arriving; nothing leaves in response. Adding the missing
+return route fixes it immediately.
 
 **Debug container to inspect ARP:**
 ```bash
