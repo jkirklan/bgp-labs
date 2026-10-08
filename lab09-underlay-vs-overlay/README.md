@@ -15,6 +15,14 @@
 
 **VXLAN** (RFC 7348) encapsulates an inner Ethernet frame inside a UDP packet on port 4789. Each encapsulated segment gets a 24-bit VNI (VXLAN Network Identifier). The outer IP header uses underlay addresses; the inner frame uses overlay addresses.
 
+> **Real-world note:** If you work with OpenShift or Kubernetes, you'll encounter
+> **Geneve** (UDP port 6081) rather than VXLAN — it is the default overlay for
+> OVN-Kubernetes. Geneve uses the same VNI-based segmentation model and the same BGP
+> EVPN control plane; the difference is an extensible options header that lets the
+> control plane attach metadata to frames. The concepts you learn here transfer
+> directly. See [Network Layers](../docs/04-reference/network-layers.md) for a
+> side-by-side comparison.
+
 **VTEP** (VXLAN Tunnel Endpoint) is a device that encapsulates and decapsulates VXLAN frames. In this lab, each FRR router also acts as a VTEP — it has a `vxlan0` interface that handles encapsulation automatically.
 
 When vtep-a pings 192.168.10.2, the kernel encapsulates the ICMP packet in VXLAN:

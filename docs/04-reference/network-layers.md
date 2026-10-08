@@ -129,27 +129,17 @@ Overlay protocols take traffic from one layer and wrap it inside another layer's
 headers so it can travel across a different kind of network. The inner traffic is the
 tenant's payload; the outer headers are the underlay transport.
 
-### VXLAN — L2 over UDP/IP
-
-VXLAN (Virtual eXtensible LAN) takes an L2 Ethernet frame and wraps it inside a
-UDP/IP packet so it can travel across an L3 network.
-
-```
-Outer:  Ethernet (L2) → IP (L3) → UDP port 4789 (L4) → VXLAN header (VNI)
-Inner:  Ethernet frame (L2) → IP packet (L3) → TCP/UDP (L4) → Application (L7)
-```
-
-Key properties:
-- **VNI** (VXLAN Network Identifier) — 24-bit segment ID; up to 16 million virtual segments
-- **Multicast or unicast** underlay — VTEPs (tunnel endpoints) learn each other's addresses
-  via BGP EVPN (as in Labs 09–10 and 14) or flood-and-learn
-- **Stateless** — no connection setup; each packet is independently encapsulated
+> **What you'll encounter:** If you work with OpenShift or Kubernetes, you'll see
+> **Geneve** — it is the default overlay for OVN-Kubernetes (OpenShift's CNI) and is
+> used by Antrea and Cilium. The labs in this series use VXLAN because it has simpler
+> Linux tooling, but the concepts transfer directly: same encapsulation model, same
+> VNI-based segmentation, same BGP EVPN control plane.
 
 ### Geneve — Extensible Overlay Encapsulation
 
-Geneve (Generic Network Virtualization Encapsulation, RFC 8926) is a newer overlay
-protocol designed to supersede VXLAN, NVGRE, and STT. It uses the same UDP transport
-as VXLAN but adds a **variable-length options header** for carrying arbitrary metadata.
+Geneve (Generic Network Virtualization Encapsulation, RFC 8926) is the dominant overlay
+protocol in modern Kubernetes and OpenShift environments. It uses UDP transport and adds
+a **variable-length options header** for carrying arbitrary metadata alongside each frame.
 
 ```
 Outer:  Ethernet (L2) → IP (L3) → UDP port 6081 (L4) → Geneve header (VNI + options)
@@ -157,26 +147,46 @@ Inner:  Ethernet frame (L2) → IP packet (L3) → TCP/UDP (L4) → Application 
 ```
 
 Key properties:
-- **VNI** — same 24-bit virtual network identifier as VXLAN
+- **VNI** — 24-bit virtual network identifier; up to 16 million virtual segments
 - **Options header** — TLV (type-length-value) fields let the control plane attach
-  metadata to each packet: policy tags, flow IDs, timestamps
-- **Used by** Open vSwitch (OVN), Kubernetes network plugins (Antrea, Cilium with
-  Geneve backend), and some cloud provider fabrics
-- **Wire-compatible** with VXLAN when no options are present — same outer structure
-  minus the options; a VXLAN VTEP and a Geneve VTEP cannot interoperate directly
+  metadata to each packet: policy tags, flow IDs, timestamps, security labels
+- **Used by** OVN-Kubernetes (OpenShift default), Antrea, Cilium (Geneve backend),
+  Open vSwitch, and many cloud provider fabrics
+- Designed to supersede VXLAN, NVGRE, and STT as a single extensible standard
 
-**VXLAN vs. Geneve at a glance:**
+### VXLAN — L2 over UDP/IP
 
-| | VXLAN | Geneve |
+VXLAN (Virtual eXtensible LAN) takes an L2 Ethernet frame and wraps it inside a
+UDP/IP packet so it can travel across an L3 network. It predates Geneve and is
+ubiquitous in data center fabrics, storage networks, and network virtualization
+platforms (VMware NSX, Linux bridge-based overlays).
+
+```
+Outer:  Ethernet (L2) → IP (L3) → UDP port 4789 (L4) → VXLAN header (VNI)
+Inner:  Ethernet frame (L2) → IP packet (L3) → TCP/UDP (L4) → Application (L7)
+```
+
+Key properties:
+- **VNI** (VXLAN Network Identifier) — same 24-bit segment ID as Geneve
+- **Fixed 8-byte header** — no options; simpler to implement and inspect
+- **Multicast or unicast** underlay — VTEPs learn each other's addresses via BGP EVPN
+  (as in Labs 09–10 and 14) or flood-and-learn
+- **Stateless** — no connection setup; each packet is independently encapsulated
+
+**Geneve vs. VXLAN at a glance:**
+
+| | Geneve | VXLAN |
 |---|---|---|
-| UDP port | 4789 | 6081 |
-| Header size | Fixed (8 bytes) | Variable (min 8 bytes + options) |
-| Metadata | None | Arbitrary TLV options |
-| Adoption | Ubiquitous | Growing (OVN, Cilium) |
+| UDP port | 6081 | 4789 |
+| Header size | Variable (min 8 bytes + options) | Fixed (8 bytes) |
+| Metadata | Arbitrary TLV options | None |
+| Common in | OpenShift, Kubernetes (OVN-K, Antrea, Cilium) | Data center fabrics, VMware NSX, these labs |
 
 Both protocols create an **overlay** network — from the tenant's perspective, two
 containers in the same VNI appear to be on the same Ethernet segment, even if they're
-on different physical hosts separated by routers.
+on different physical hosts separated by routers. A Geneve VTEP and a VXLAN VTEP
+cannot interoperate directly (different UDP ports and header formats), but the
+BGP EVPN control plane used to distribute tunnel endpoint addresses works with both.
 
 ## Layer summary for these labs
 
@@ -189,7 +199,7 @@ on different physical hosts separated by routers.
 | Routing table / static routes | L3 | Forwarding decisions across networks |
 | ICMP / ping | L3 | Reachability testing |
 | BGP route exchange | L7 over L4/L3/L2 | Dynamic distribution of L3 routing information |
-| VXLAN encapsulation | L2-in-L4/L3 | Overlay — stretch L2 segments across L3 fabric |
-| Geneve encapsulation | L2-in-L4/L3 | Extensible overlay — same as VXLAN plus metadata options |
+| Geneve encapsulation | L2-in-L4/L3 | Extensible overlay — OpenShift/K8s default (OVN-Kubernetes) |
+| VXLAN encapsulation | L2-in-L4/L3 | Overlay — data center fabrics, VMware NSX, these labs |
 | VRF | L3 | Multiple isolated routing tables on one router |
 | TCP port 179 (BGP) | L4 | Transport session for BGP messages |
