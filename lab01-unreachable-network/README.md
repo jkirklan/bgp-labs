@@ -8,6 +8,97 @@
 
 ## Concepts
 
+### Network Interfaces
+
+A **network interface** is a logical attachment point to a network — either physical
+(a NIC) or virtual (a veth, bridge, loopback, VXLAN, etc.). Every interface has:
+
+- A **name** (`eth0`, `lo`, `vxlan0`, …)
+- A **MAC address** — a hardware-level identifier unique to that interface
+- One or more **IP addresses** with a **prefix length** (e.g., `/24`)
+- A **state** — UP (active) or DOWN
+
+Inspect all interfaces inside a running container with:
+
+```bash
+podman exec lab01-host-a ip addr
+```
+
+Example output:
+
+```
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 ...
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 ...
+    link/ether aa:bb:cc:11:22:33 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.101.10/24 brd 192.168.101.255 scope global eth0
+```
+
+Reading it line by line:
+
+| Field | Meaning |
+|-------|---------|
+| `2: eth0:` | Interface index (2) and name (`eth0`) |
+| `<BROADCAST,MULTICAST,UP,LOWER_UP>` | Interface flags — `UP` means the interface is enabled; `LOWER_UP` means the physical/virtual link is active |
+| `mtu 1500` | Maximum Transmission Unit — the largest single frame this interface will send (bytes) |
+| `link/ether aa:bb:cc:11:22:33` | The MAC address of this interface |
+| `brd ff:ff:ff:ff:ff:ff` | The broadcast MAC address |
+| `inet 192.168.101.10/24` | The IPv4 address and prefix length — `/24` means the first 24 bits are the network, leaving 8 bits for hosts (addresses 192.168.101.1–254) |
+| `brd 192.168.101.255` | The broadcast address for this subnet — packets to this address reach all hosts on the subnet |
+| `scope global` | This address is reachable from other networks (vs. `scope host` which is loopback-only) |
+
+The loopback interface (`lo`, 127.0.0.1/8) is present in every network namespace and
+is used for local communication — packets sent to 127.0.0.1 never leave the host.
+
+### Network Routes
+
+A **routing table** tells the kernel where to send packets. For each destination, it
+records which interface to send out of and (for non-connected networks) which next-hop
+IP to forward to.
+
+View the kernel routing table:
+
+```bash
+podman exec lab01-host-a ip route show
+```
+
+Example output (before static routes are added):
+
+```
+192.168.101.0/24 dev eth0 proto kernel scope link src 192.168.101.10
+```
+
+| Field | Meaning |
+|-------|---------|
+| `192.168.101.0/24` | The destination network — packets to any address in this range match this entry |
+| `dev eth0` | Send out interface `eth0` |
+| `proto kernel` | This route was added automatically by the kernel when the IP address was assigned |
+| `scope link` | The destination is directly reachable on this link — no next-hop needed |
+| `src 192.168.101.10` | When originating a packet to this network, use this source IP |
+
+When a packet arrives destined for `192.168.102.10`, the kernel checks the routing
+table. There is no entry for `192.168.102.0/24`, and there is no default route
+(`0.0.0.0/0`). The packet is dropped — which is exactly the failure this lab demonstrates.
+
+After adding a static route, the table gains:
+
+```
+192.168.102.0/24 via 192.168.101.254 dev eth0 proto static
+```
+
+| Field | Meaning |
+|-------|---------|
+| `via 192.168.101.254` | Forward to this next-hop IP (lab01-router-a's interface on net-a) |
+| `proto static` | This route was added manually, not by the kernel or a routing protocol |
+
+**`ip route` vs. `vtysh show ip route`:** `ip route show` reads the Linux kernel
+forwarding table directly. `vtysh show ip route` reads FRR's own routing table (the
+RIB — Routing Information Base). FRR installs its selected routes into the kernel,
+so both views should match. FRR's view adds extra context: how the route was learned
+(C/S/B), administrative distance, and age — see [Route Source Codes](../docs/04-reference/routing-source-codes.md).
+
 Every network interface belongs to a subnet — a broadcast domain where hosts
 communicate directly using ARP. When a packet's destination is in a *different*
 subnet, the sender must forward it to a **router** that has a path to that subnet.
@@ -15,10 +106,6 @@ subnet, the sender must forward it to a **router** that has a path to that subne
 Without a routing entry, the packet is dropped. This lab makes that failure visible
 and shows how static routes repair it — and why you wouldn't want to manage them
 manually at any real scale.
-
-A **routing table** is a list of (destination prefix → next-hop) entries. When
-a router receives a packet, it looks up the destination IP, finds the best matching
-prefix, and forwards the packet to the next hop.
 
 **Static routes** are manual entries you add yourself. They work for small,
 stable topologies. When you have 1000 prefixes or routes that change dynamically,
