@@ -18,7 +18,7 @@ When two containers are on **different** Podman networks, they're in different b
 domains. ARP requests don't cross network boundaries; packets need a router to forward
 them between subnets.
 
-An **SVI** (Switched Virtual Interface) is the router's interface into a VLAN — the
+An **[SVI](../docs/04-reference/svi-and-trunking.md)** (Switched Virtual Interface) is the router's interface into a VLAN — the
 gateway IP that hosts in that VLAN use to reach other subnets. In this lab, lab02-router-a
 has one SVI on each network.
 
