@@ -28,7 +28,7 @@ cd labs/lab00-build-your-router && ./setup.sh
 | [Lab 11](lab11-ibgp-fullmesh/README.md) | iBGP Full Mesh | iBGP, split-horizon rule, next-hop-self, full mesh |
 | [Lab 12](lab12-route-reflector/README.md) | Route Reflector | RR, route-reflector-client, ORIGINATOR_ID, CLUSTER_LIST |
 | [Lab 13](lab13-path-selection/README.md) | Path Selection | LOCAL_PREF, AS_PATH prepending, MED, decision process |
-| Lab 14 *(coming soon)* | L3VPN / VRF Route Leaking | VRF-aware BGP, route distinguishers, route targets, controlled inter-VRF leaking, EVPN symmetric IRB |
+| [Lab 14](lab14-l3vpn-vrf-leaking/README.md) | L3VPN / VRF Route Leaking | VRF-aware BGP, route distinguishers, route targets, controlled inter-VRF leaking, EVPN symmetric IRB |
 | [Lab 15](lab15-operational-bgp/README.md) | Operational BGP | Bogon filtering, prefix-lists, max-prefix, route leaks |
 | [Lab 16](lab16-ipv6-bgp/README.md) | BGP with IPv6 | IPv6 address family, activate, dual-stack MP-BGP |
 

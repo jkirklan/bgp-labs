@@ -31,6 +31,7 @@ ALL_LABS = [
     "lab11-ibgp-fullmesh",
     "lab12-route-reflector",
     "lab13-path-selection",
+    "lab14-l3vpn-vrf-leaking",
     "lab15-operational-bgp",
     "lab16-ipv6-bgp",
 ]

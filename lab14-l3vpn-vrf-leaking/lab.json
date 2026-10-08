@@ -1,0 +1,18 @@
+{
+  "lab": "lab14-l3vpn-vrf-leaking",
+  "routers": [
+    {"name": "lab14-pe1", "asn": 65001, "interfaces": ["eth0", "eth1", "eth2"]},
+    {"name": "lab14-pe2", "asn": 65002, "interfaces": ["eth0", "eth1", "eth2"]},
+    {"name": "lab14-ce-a1", "asn": 0, "interfaces": ["eth0"]},
+    {"name": "lab14-ce-a2", "asn": 0, "interfaces": ["eth0"]},
+    {"name": "lab14-ce-b1", "asn": 0, "interfaces": ["eth0"]},
+    {"name": "lab14-ce-b2", "asn": 0, "interfaces": ["eth0"]}
+  ],
+  "networks": [
+    {"name": "lab14-underlay",    "subnet": "10.0.12.0/30"},
+    {"name": "lab14-ce-a1-link",  "subnet": "192.168.10.0/24"},
+    {"name": "lab14-ce-a2-link",  "subnet": "192.168.20.0/24"},
+    {"name": "lab14-ce-b1-link",  "subnet": "192.168.30.0/24"},
+    {"name": "lab14-ce-b2-link",  "subnet": "192.168.40.0/24"}
+  ]
+}
