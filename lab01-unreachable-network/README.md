@@ -158,12 +158,6 @@ you need a routing *protocol* — which is what BGP is.
 
 ## Topology
 
-```
-[lab01-host-a]────────────[lab01-router-a]────────────[lab01-host-b]
- 192.168.101.10/24          192.168.101.254  192.168.102.254          192.168.102.10/24
-      lab01-net-a (192.168.101.0/24)   lab01-net-b (192.168.102.0/24)
-```
-
 ```mermaid
 graph LR
     A["lab01-host-a<br>192.168.101.10/24"] <-->|"lab01-net-a<br>192.168.101.0/24"| R["lab01-router-a<br>192.168.101.254 | 192.168.102.254"]
