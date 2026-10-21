@@ -1,0 +1,40 @@
+name: Smoke Test (macOS)
+
+# Runs on a self-hosted Mac (laptop) that is not always awake, so it is never
+# triggered by push/pull_request — a sleeping runner must not block main CI.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-macos:
+    name: Smoke (macOS / podman machine)
+    runs-on: [self-hosted, macOS, podman-machine]
+    timeout-minutes: 60
+    env:
+      # Pin every podman call to the runner's own machine, never podman-machine-default.
+      CONTAINER_CONNECTION: ci-runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Podman machine
+        run: |
+          podman machine start ci-runner || true
+          for i in $(seq 1 30); do
+            podman info >/dev/null 2>&1 && break
+            sleep 5
+          done
+          podman info --format '{{.Host.Arch}} {{.Version.Version}}'
+
+      - name: Run full smoke suite
+        env:
+          REPO_ROOT: ${{ github.workspace }}
+        run: bash tests/integration/smoke-all.sh
+
+      - name: Stop Podman machine
+        if: always()
+        run: podman machine stop ci-runner
