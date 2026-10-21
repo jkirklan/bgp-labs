@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Rootless containers can't load kernel modules; check the host has them loaded.
+# (/proc/modules is absent on macOS — the Podman machine VM is checked by the lab's smoke test.)
+if [ -r /proc/modules ]; then
+  for mod in vxlan vrf; do
+    grep -q "^${mod} " /proc/modules || echo "WARNING: kernel module '${mod}' is not loaded. Run: sudo modprobe ${mod}"
+  done
+fi
 LAB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${LAB_DIR}/.." && pwd)"
 TOPO_PORT=8314

@@ -29,6 +29,9 @@ jobs:
             sleep 5
           done
           podman info --format '{{.Host.Arch}} {{.Version.Version}}'
+          # Rootless containers can't load modules; load them in the machine VM.
+          podman machine ssh ci-runner "sudo modprobe -a vxlan vrf" \
+            || echo "::warning::could not load vxlan/vrf in ci-runner; VXLAN/VRF labs will skip"
 
       - name: Run full smoke suite
         env:
