@@ -11,8 +11,8 @@ assert_containers_running "lab12-"
 echo "Checking pre-configured eBGP sessions..."
 # router-b1 has eBGP to router-a (AS65001).
 assert_bgp_established "lab12-router-b1" 1 "router-b1 (eBGP to router-a)"
-# router-b3 has eBGP to router-c (AS65003).
-assert_bgp_established "lab12-router-b3" 1 "router-b3 (eBGP to router-c)"
+# router-b2 has eBGP to router-c (AS65003); router-b3 is an internal RR client.
+assert_bgp_established "lab12-router-b2" 1 "router-b2 (eBGP to router-c)"
 
 echo ""
 echo "NOTE: iBGP sessions to the Route Reflector are NOT expected yet."

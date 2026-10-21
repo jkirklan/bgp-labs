@@ -13,7 +13,7 @@ assert_bgp_established "lab07-transit" 3 "transit (3 peers: cust-a, cust-b, peer
 
 # Customer A's prefix should be in the transit router's BGP table.
 if podman exec lab07-transit vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-   | grep -q "192.168.10.0\|192.168.1.0"; then
+   | grep -q "172.16.1.0"; then
   pass "transit: customer-A prefix visible"
 else
   fail "transit: customer-A prefix missing"

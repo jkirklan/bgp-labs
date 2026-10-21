@@ -59,4 +59,4 @@ sleep 5
 . "${REPO_ROOT}/scripts/start-watchers.sh"
 
 echo "Lab 05 is up. topology-watch: http://localhost:${TOPO_PORT}"
-echo "router-d sessions will show red until configured."
+echo "All sessions come up automatically — router-d receives 192.168.1.0/24 via two paths."

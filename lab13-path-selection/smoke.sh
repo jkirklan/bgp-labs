@@ -21,12 +21,14 @@ else
   fail "router-a: 192.168.4.0/24 not in BGP table"
 fi
 
-# router-d should see router-a's prefix (pre-configured in router-a.conf).
-if podman exec lab13-router-d vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-   | grep -q "192.168.1.0"; then
-  pass "router-d: 192.168.1.0/24 (router-a) is reachable via BGP"
+# README: router-a receives 192.168.4.0/24 via two independent paths.
+path_count=$(podman exec lab13-router-a vtysh -c "show bgp ipv4 unicast 192.168.4.0/24" 2>/dev/null \
+             | sed -nE 's/.*Paths: \(([0-9]+) available.*/\1/p')
+path_count=${path_count:-0}
+if [ "$path_count" -ge 2 ]; then
+  pass "router-a: ${path_count} paths to 192.168.4.0/24"
 else
-  fail "router-d: 192.168.1.0/24 not in BGP table"
+  fail "router-a: ${path_count} path(s) to 192.168.4.0/24 (expected 2)"
 fi
 
 smoke_summary

@@ -24,7 +24,7 @@ done
 
 # Customer should see a default route or the ISP's prefix via both peers.
 bgp_paths=$(podman exec lab08-customer vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-            | grep -c "^>" || true)
+            | grep -cE '^ ?\*>' || true)
 if [ "$bgp_paths" -ge 1 ]; then
   pass "customer: ${bgp_paths} best BGP path(s) installed"
 else
