@@ -77,11 +77,12 @@ run_lab() {
   # Wait for FRR to settle beyond setup.sh's own sleep.
   sleep 3
 
-  # Exercise labs: apply <lab>/solution/<router>.conf so the end state can be
-  # verified. CI-only — a student running smoke.sh tests their own config.
-  if [ -d "${lab_path}/solution" ]; then
+  # Exercise labs: apply tests/solutions/<lab>/<router>.conf so the end state
+  # can be verified. CI-only — a student running smoke.sh tests their own config.
+  local sol_dir="${REPO_ROOT}/tests/solutions/${lab_dir}"
+  if [ -d "${sol_dir}" ]; then
     local prefix="${lab_dir%%-*}" conf router
-    for conf in "${lab_path}"/solution/*.conf; do
+    for conf in "${sol_dir}"/*.conf; do
       router="$(basename "$conf" .conf)"
       echo "[solution] Applying ${router}"
       podman cp "$conf" "${prefix}-${router}:/tmp/solution.conf" \

@@ -135,6 +135,8 @@ will not invent routes; it only announces what the router actually has.
 
 **Exercise 2: Configure lab03-router-b**
 
+> CI verifies this lab with the reference answer in [`tests/solutions/lab03-hello-bgp/`](../tests/solutions/lab03-hello-bgp/). Try it yourself first.
+
 Apply the config live — no restart needed, and you'll see topology-watch react in real time:
 
 ```bash
