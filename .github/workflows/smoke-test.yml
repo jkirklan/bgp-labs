@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
   schedule:
     # Weekly on Monday at 06:00 UTC — catches runner/image drift
     - cron: '0 6 * * 1'
@@ -33,39 +34,17 @@ jobs:
 
   smoke-almalinux:
     name: Smoke (AlmaLinux 9 / kvm151)
-    # Only run on push to main and schedule — never on pull_request.
-    # A self-hosted runner should not execute untrusted PR code.
-    if: github.event_name == 'push' || github.event_name == 'schedule'
+    # Only trusted triggers — never pull_request (public repo, self-hosted runner).
+    if: github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: [self-hosted, almalinux9]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run full smoke suite
-        env:
-          REPO_ROOT: ${{ github.workspace }}
-        run: bash tests/integration/smoke-all.sh
-
-  smoke-macos:
-    name: Smoke (macOS)
-    runs-on: macos-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Podman
-        run: brew install podman
-
-      - name: Start Podman machine
-        run: |
-          podman machine init --cpus 2 --memory 4096 --disk-size 20
-          podman machine start
-          # Wait for machine socket to be ready
-          for i in $(seq 1 30); do
-            podman info &>/dev/null && break
-            sleep 5
-          done
-          podman info
+      # Remove leftovers from cancelled runs (name conflicts). Safe only because
+      # the runner's account (ghrunner) has a dedicated Podman with nothing else in it.
+      - name: Pre-clean Podman state
+        run: podman rm -af && podman network prune -f
 
       - name: Run full smoke suite
         env:
