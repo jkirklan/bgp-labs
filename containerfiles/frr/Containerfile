@@ -10,9 +10,10 @@ LABEL org.opencontainers.image.title="frr" \
 
 USER root
 
-# EPEL provides FRR; AlmaLinux 9 CRB repo satisfies its dependencies
+# EPEL provides FRR; AlmaLinux 9 CRB repo satisfies its dependencies.
+# iproute is explicit: install_weak_deps=0 drops it, and labs run `ip` in the containers.
 RUN dnf install -y epel-release && \
-    dnf install -y --nodocs --setopt=install_weak_deps=0 frr && \
+    dnf install -y --nodocs --setopt=install_weak_deps=0 frr iproute && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
