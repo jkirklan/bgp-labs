@@ -14,11 +14,12 @@ else
   exit 1
 fi
 
-# Verify vtysh binary responds inside the image.
-if podman run --rm frr:latest vtysh --version 2>/dev/null | grep -q "FRRouting"; then
-  pass "vtysh --version returns FRRouting"
+# Verify vtysh binary responds inside the image. --entrypoint is required:
+# docker-start.sh ignores arguments and always execs watchfrr (never exits).
+if podman run --rm --entrypoint vtysh frr:latest --help 2>/dev/null | grep -q "Integrated shell for FRR"; then
+  pass "vtysh --help identifies FRR"
 else
-  fail "vtysh --version did not return expected output"
+  fail "vtysh --help did not return expected output"
 fi
 
 smoke_summary

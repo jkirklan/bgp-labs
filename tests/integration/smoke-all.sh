@@ -4,7 +4,7 @@
 # Usage:
 #   Lima VM:  limactl shell <vm> -- bash /path/to/smoke-all.sh
 #   CI:       REPO_ROOT=$GITHUB_WORKSPACE bash tests/integration/smoke-all.sh
-#   Local:    bash labs/tests/integration/smoke-all.sh
+#   Local:    bash tests/integration/smoke-all.sh   (or labs/tests/... from the know repo)
 #
 # Individual labs can be run in isolation:
 #   bash labs/lab03-hello-bgp/smoke.sh   (after running setup.sh)
@@ -14,14 +14,14 @@ TOTAL_PASS=0
 TOTAL_FAIL=0
 SKIPPED=0
 
-# Resolve REPO_ROOT: prefer env var (CI), else climb from this script's location.
+# Resolve REPO_ROOT (bgp-labs root, where lab dirs live): prefer env var (CI), else climb from this script.
 if [ -n "${REPO_ROOT:-}" ]; then
   CLONED=false
 else
-  REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../" && pwd)"
+  REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
   CLONED=false
 fi
-LABS_DIR="${REPO_ROOT}/labs"
+LABS_DIR="${REPO_ROOT}"
 
 echo "=== BGP Labs Full Smoke Test ==="
 echo "Host:   $(uname -a)"
@@ -128,4 +128,8 @@ echo " Labs failed:  ${TOTAL_FAIL}"
 echo " Skipped:      ${SKIPPED}"
 echo "═══════════════════════════════════════"
 
+if [ $((TOTAL_PASS + TOTAL_FAIL)) -eq 0 ]; then
+  echo "ERROR: no labs executed"
+  exit 1
+fi
 [ "${TOTAL_FAIL}" -eq 0 ]
