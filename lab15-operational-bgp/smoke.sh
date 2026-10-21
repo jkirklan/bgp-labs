@@ -32,7 +32,7 @@ if podman exec lab15-router-a vtysh -c "show bgp summary" 2>/dev/null \
    | grep -v "Established" | grep -q "PfxRcd"; then
   :  # table is showing, all is well
 fi
-bgp_state=$(podman exec lab15-router-a vtysh -c "show bgp summary" 2>/dev/null | grep "Established" | wc -l)
+bgp_state=$(bgp_established_count "lab15-router-a")
 if [ "$bgp_state" -ge 2 ]; then
   pass "router-a: ${bgp_state} sessions Established (no max-prefix shutdown)"
 else
