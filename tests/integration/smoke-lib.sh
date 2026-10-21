@@ -164,7 +164,8 @@ assert_bgp6_established() {
   local container="$1"
   local min_count="${2:-1}"
   local label="${3:-$container IPv6}"
-  if wait_bgp6_established "$container" "$min_count" 30; then
+  # 90s: IPv6 sessions can miss the first connect while addresses finish DAD.
+  if wait_bgp6_established "$container" "$min_count" 90; then
     local count
     count=$(bgp6_established_count "$container")
     pass "${label}: ${count} IPv6 BGP session(s) Established (expected ≥${min_count})"

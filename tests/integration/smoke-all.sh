@@ -77,6 +77,20 @@ run_lab() {
   # Wait for FRR to settle beyond setup.sh's own sleep.
   sleep 3
 
+  # Exercise labs: apply <lab>/solution/<router>.conf so the end state can be
+  # verified. CI-only — a student running smoke.sh tests their own config.
+  if [ -d "${lab_path}/solution" ]; then
+    local prefix="${lab_dir%%-*}" conf router
+    for conf in "${lab_path}"/solution/*.conf; do
+      router="$(basename "$conf" .conf)"
+      echo "[solution] Applying ${router}"
+      podman cp "$conf" "${prefix}-${router}:/tmp/solution.conf" \
+        && podman exec "${prefix}-${router}" vtysh -f /tmp/solution.conf >/dev/null \
+        || echo "  WARN: could not apply solution to ${prefix}-${router}"
+    done
+    sleep 3
+  fi
+
   local smoke_out
   smoke_out=$(bash "${lab_path}/smoke.sh" 2>&1)
   local smoke_rc=$?
