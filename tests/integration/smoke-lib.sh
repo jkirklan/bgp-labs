@@ -106,6 +106,19 @@ assert_route_present() {
   fi
 }
 
+# Wait up to <timeout> seconds (default 30) for <pattern> in the IPv6 BGP table.
+wait_bgp6_route() {
+  local container="$1" pattern="$2" timeout="${3:-30}" elapsed=0
+  while [ "$elapsed" -lt "$timeout" ]; do
+    if podman exec "$container" vtysh -c "show bgp ipv6 unicast" 2>/dev/null | grep -q "$pattern"; then
+      return 0
+    fi
+    sleep 2
+    elapsed=$((elapsed+2))
+  done
+  return 1
+}
+
 # Assert a route prefix is present in the IPv6 BGP table of <container>.
 assert_ipv6_route_present() {
   local container="$1"

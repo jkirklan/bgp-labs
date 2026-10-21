@@ -17,16 +17,14 @@ assert_bgp6_established "lab16-router-c" 1 "router-c IPv6 BGP (to router-b)"
 
 echo "Checking IPv6 route propagation..."
 # router-a should learn 2001:db8:3::/48 from router-c via router-b.
-if podman exec lab16-router-a vtysh -c "show bgp ipv6 unicast" 2>/dev/null \
-   | grep -q "2001:db8:3"; then
+if wait_bgp6_route lab16-router-a "2001:db8:3"; then
   pass "router-a: learned 2001:db8:3::/48 from router-c (via transit)"
 else
   fail "router-a: 2001:db8:3::/48 not in IPv6 BGP table"
 fi
 
 # router-c should learn 2001:db8:1::/48 from router-a via router-b.
-if podman exec lab16-router-c vtysh -c "show bgp ipv6 unicast" 2>/dev/null \
-   | grep -q "2001:db8:1"; then
+if wait_bgp6_route lab16-router-c "2001:db8:1"; then
   pass "router-c: learned 2001:db8:1::/48 from router-a (via transit)"
 else
   fail "router-c: 2001:db8:1::/48 not in IPv6 BGP table"
