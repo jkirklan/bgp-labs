@@ -20,6 +20,20 @@ podman run -d --name lab03-router-a \
 
 Always: `no bgp ebgp-requires-policy` in FRR BGP configs.
 
+- **Every container that pings needs `--cap-add NET_RAW`.** Podman 6 (macOS machine) doesn't allow unprivileged ICMP by default; without it `ping` fails with `socket: Operation not permitted`.
+- **IPv6 neighbors:** add `neighbor <ip> timers connect 5`. The first connect can fail during DAD, and FRR's default retry is 120s.
+- **Don't use `192.168.1.0/24` for Podman networks.** It's the default home LAN and collides with the host route (lab03/04/11/12 still do; tracked in Todoist).
+- **VXLAN/VRF labs need the host's `vxlan`/`vrf` modules loaded.** Rootless containers can't load them; `setup.sh` warns, CI loads them.
+
+## Smoke Tests (`tests/integration/`)
+
+- `smoke-all.sh` runs every lab: setup → (CI-only solutions) → `smoke.sh` → teardown. It fails if zero labs run.
+- **BGP session counts:** use `bgp_established_count` / `bgp6_established_count` (JSON). `show bgp summary` text never prints "Established" for up peers; it shows the prefix count.
+- **Route presence:** use `wait_bgp_route` / `wait_bgp6_route` (retry up to 30s). Routes lag session establishment, so one-shot checks flake.
+- **Exercise labs:** reference answers live in `tests/solutions/<lab>/<router>.conf`, applied by `smoke-all.sh` only (never by `setup.sh`/`smoke.sh`). See `tests/solutions/README.md`.
+- Smoke assertions must match the lab README's Verification section; check the README before trusting a failing smoke test.
+- Test a branch on all runners: `gh workflow run smoke-test.yml --ref <branch>` and `gh workflow run smoke-macos.yml --ref <branch>` (pushes to non-main branches don't trigger CI).
+
 ## Naming and Port Conventions
 
 - Container names: `labXX-<role>` (e.g., `lab03-router-a`) — required for simultaneous lab operation
