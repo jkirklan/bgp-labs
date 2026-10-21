@@ -31,6 +31,19 @@ assert_containers_running() {
   $all_ok
 }
 
+# Count Established BGP neighbors on <container>. Uses JSON: the text summary
+# shows a prefix count (not the word "Established") for peers that are up.
+bgp_established_count() {
+  podman exec "$1" vtysh -c "show bgp neighbors json" 2>/dev/null \
+    | grep -cE '"bgpState": ?"Established"' || true
+}
+
+# Count Established IPv6-unicast BGP peers on <container>.
+bgp6_established_count() {
+  podman exec "$1" vtysh -c "show bgp ipv6 unicast summary json" 2>/dev/null \
+    | grep -cE '"state": ?"Established"' || true
+}
+
 # Wait up to <timeout> seconds for a BGP session to show at least <min_count>
 # Established peers on <container>.
 wait_bgp_established() {
@@ -40,8 +53,7 @@ wait_bgp_established() {
   local elapsed=0
   while [ "$elapsed" -lt "$timeout" ]; do
     local count
-    count=$(podman exec "$container" vtysh -c "show bgp summary" 2>/dev/null \
-            | grep -c "Established" || true)
+    count=$(bgp_established_count "$container")
     if [ "$count" -ge "$min_count" ]; then
       return 0
     fi
@@ -58,13 +70,11 @@ assert_bgp_established() {
   local label="${3:-$container}"
   if wait_bgp_established "$container" "$min_count" 30; then
     local count
-    count=$(podman exec "$container" vtysh -c "show bgp summary" 2>/dev/null \
-            | grep -c "Established" || true)
+    count=$(bgp_established_count "$container")
     pass "${label}: ${count} BGP session(s) Established (expected ≥${min_count})"
   else
     local count
-    count=$(podman exec "$container" vtysh -c "show bgp summary" 2>/dev/null \
-            | grep -c "Established" || echo "0")
+    count=$(bgp_established_count "$container")
     fail "${label}: only ${count} BGP session(s) Established (expected ≥${min_count})"
   fi
 }
@@ -139,8 +149,7 @@ wait_bgp6_established() {
   local elapsed=0
   while [ "$elapsed" -lt "$timeout" ]; do
     local count
-    count=$(podman exec "$container" vtysh -c "show bgp ipv6 unicast summary" 2>/dev/null \
-            | grep -c "Established" || true)
+    count=$(bgp6_established_count "$container")
     if [ "$count" -ge "$min_count" ]; then
       return 0
     fi
@@ -157,13 +166,11 @@ assert_bgp6_established() {
   local label="${3:-$container IPv6}"
   if wait_bgp6_established "$container" "$min_count" 30; then
     local count
-    count=$(podman exec "$container" vtysh -c "show bgp ipv6 unicast summary" 2>/dev/null \
-            | grep -c "Established" || true)
+    count=$(bgp6_established_count "$container")
     pass "${label}: ${count} IPv6 BGP session(s) Established (expected ≥${min_count})"
   else
     local count
-    count=$(podman exec "$container" vtysh -c "show bgp ipv6 unicast summary" 2>/dev/null \
-            | grep -c "Established" || echo "0")
+    count=$(bgp6_established_count "$container")
     fail "${label}: only ${count} IPv6 session(s) Established (expected ≥${min_count})"
   fi
 }
