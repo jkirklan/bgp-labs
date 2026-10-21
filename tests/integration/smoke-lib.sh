@@ -79,6 +79,20 @@ assert_bgp_established() {
   fi
 }
 
+# Wait up to <timeout> seconds (default 30) for <pattern> to appear in the IPv4
+# BGP table of <container>. Routes can arrive a few seconds after sessions are up.
+wait_bgp_route() {
+  local container="$1" pattern="$2" timeout="${3:-30}" elapsed=0
+  while [ "$elapsed" -lt "$timeout" ]; do
+    if podman exec "$container" vtysh -c "show bgp ipv4 unicast" 2>/dev/null | grep -q "$pattern"; then
+      return 0
+    fi
+    sleep 2
+    elapsed=$((elapsed+2))
+  done
+  return 1
+}
+
 # Assert a route prefix is present in the BGP table of <container>.
 assert_route_present() {
   local container="$1"

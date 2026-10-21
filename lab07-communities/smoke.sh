@@ -12,8 +12,7 @@ echo "Waiting for BGP sessions on transit router..."
 assert_bgp_established "lab07-transit" 3 "transit (3 peers: cust-a, cust-b, peer)"
 
 # Customer A's prefix should be in the transit router's BGP table.
-if podman exec lab07-transit vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-   | grep -q "172.16.1.0"; then
+if wait_bgp_route lab07-transit "172.16.1.0"; then
   pass "transit: customer-A prefix visible"
 else
   fail "transit: customer-A prefix missing"

@@ -24,8 +24,7 @@ echo "NOTE: iBGP between router-b1 and router-b2 is NOT expected yet."
 echo "      The student configures that in the exercises."
 
 # router-a's prefix is visible on router-b1 (direct eBGP).
-if podman exec lab11-router-b1 vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-   | grep -q "192.168.1.0"; then
+if wait_bgp_route lab11-router-b1 "192.168.1.0"; then
   pass "router-b1: 192.168.1.0/24 (router-a prefix) visible via eBGP"
 else
   fail "router-b1: 192.168.1.0/24 missing"

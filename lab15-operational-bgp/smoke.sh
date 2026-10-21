@@ -15,8 +15,7 @@ assert_bgp_established "lab15-router-b" 1 "router-b (peer to router-a)"
 echo "Checking pre-filter state: bogon routes should be visible on router-a..."
 # router-c announces RFC 1918 bogons — they appear before filtering.
 for bogon in "10.0.0.0" "192.168.0.0" "172.16.0.0"; do
-  if podman exec lab15-router-a vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-     | grep -q "${bogon}"; then
+  if wait_bgp_route lab15-router-a "${bogon}"; then
     pass "router-a: bogon ${bogon}/x present (pre-filter — expected)"
   else
     fail "router-a: bogon ${bogon}/x missing (should be visible before student applies filter)"

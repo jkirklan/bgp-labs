@@ -13,9 +13,13 @@ assert_bgp_established "lab05-router-d" 2 "router-d (2 providers: router-b and r
 
 # README Verification: router-d sees 192.168.1.0/24 via both paths.
 echo "Checking router-d has two paths to 192.168.1.0/24..."
-path_count=$(podman exec lab05-router-d vtysh -c "show bgp ipv4 unicast 192.168.1.0/24" 2>/dev/null \
-             | sed -nE 's/.*Paths: \(([0-9]+) available.*/\1/p')
-path_count=${path_count:-0}
+for _ in $(seq 1 15); do  # second path can lag the first by a few seconds
+  path_count=$(podman exec lab05-router-d vtysh -c "show bgp ipv4 unicast 192.168.1.0/24" 2>/dev/null \
+               | sed -nE 's/.*Paths: \(([0-9]+) available.*/\1/p')
+  path_count=${path_count:-0}
+  [ "$path_count" -ge 2 ] && break
+  sleep 2
+done
 if [ "$path_count" -ge 2 ]; then
   pass "router-d: ${path_count} paths to 192.168.1.0/24"
 else

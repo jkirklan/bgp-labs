@@ -16,8 +16,7 @@ assert_bgp_established "lab06-router-b" 1 "router-b (ISP — router-a peer)"
 # Before student applies filters, all 3 prefixes from router-a should be in router-b's table.
 echo "Checking pre-filter state: all 3 customer prefixes visible at ISP..."
 for prefix in "192.168.1.0" "192.168.2.0" "10.0.0.0"; do
-  if podman exec lab06-router-b vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-     | grep -q "${prefix}"; then
+  if wait_bgp_route lab06-router-b "${prefix}"; then
     pass "router-b: ${prefix} present (pre-filter)"
   else
     fail "router-b: ${prefix} missing (should be present before filtering)"

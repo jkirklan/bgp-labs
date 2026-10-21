@@ -14,8 +14,7 @@ assert_bgp_established "lab08-customer" 2 "customer (primary + backup ISPs)"
 
 # Both ISPs should see the customer's prefix.
 for router in lab08-isp-primary lab08-isp-backup; do
-  if podman exec "$router" vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-     | grep -q "192.168.100.0"; then
+  if wait_bgp_route "$router" "192.168.100.0"; then
     pass "${router}: customer prefix 192.168.100.0/24 visible"
   else
     fail "${router}: customer prefix missing"

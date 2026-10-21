@@ -26,8 +26,7 @@ else
 fi
 
 # Verify router-b1 can see external prefix (from AS65001) via its eBGP session.
-if podman exec lab12-router-b1 vtysh -c "show bgp ipv4 unicast" 2>/dev/null \
-   | grep -q "192.168.1.0\|10.0.12.1"; then
+if wait_bgp_route lab12-router-b1 "192.168.1.0\|10.0.12.1"; then
   pass "router-b1: external prefix visible via eBGP"
 else
   fail "router-b1: no external prefix in BGP table"
