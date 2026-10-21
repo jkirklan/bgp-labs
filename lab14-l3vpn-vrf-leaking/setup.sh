@@ -77,17 +77,17 @@ echo "Waiting 4s for FRR to initialize ..."
 sleep 4
 
 echo "Step 4: Configuring VRFs on PE1 ..."
-# VRF-A: enslave eth1, re-add IP (enslaving removes the Podman-assigned IP)
+# VRF-A: enslave eth1, (re)assign IP — some kernels drop it on enslave, others keep it
 podman exec lab14-pe1 ip link add vrf-a type vrf table 100
 podman exec lab14-pe1 ip link set vrf-a up
 podman exec lab14-pe1 ip link set eth1 master vrf-a
-podman exec lab14-pe1 ip addr add 192.168.10.1/24 dev eth1
+podman exec lab14-pe1 ip addr replace 192.168.10.1/24 dev eth1
 
 # VRF-B: enslave eth2, re-add IP
 podman exec lab14-pe1 ip link add vrf-b type vrf table 200
 podman exec lab14-pe1 ip link set vrf-b up
 podman exec lab14-pe1 ip link set eth2 master vrf-b
-podman exec lab14-pe1 ip addr add 192.168.30.1/24 dev eth2
+podman exec lab14-pe1 ip addr replace 192.168.30.1/24 dev eth2
 
 echo "Step 5: Configuring VXLAN L3VNI interfaces on PE1 ..."
 # L3VNI 100 — VRF-A symmetric IRB VTEP
@@ -110,12 +110,12 @@ echo "Step 6: Configuring VRFs on PE2 ..."
 podman exec lab14-pe2 ip link add vrf-a type vrf table 100
 podman exec lab14-pe2 ip link set vrf-a up
 podman exec lab14-pe2 ip link set eth1 master vrf-a
-podman exec lab14-pe2 ip addr add 192.168.20.1/24 dev eth1
+podman exec lab14-pe2 ip addr replace 192.168.20.1/24 dev eth1
 
 podman exec lab14-pe2 ip link add vrf-b type vrf table 200
 podman exec lab14-pe2 ip link set vrf-b up
 podman exec lab14-pe2 ip link set eth2 master vrf-b
-podman exec lab14-pe2 ip addr add 192.168.40.1/24 dev eth2
+podman exec lab14-pe2 ip addr replace 192.168.40.1/24 dev eth2
 
 echo "Step 7: Configuring VXLAN L3VNI interfaces on PE2 ..."
 podman exec lab14-pe2 ip link add vxlan100 type vxlan id 100 dstport 4789 local 10.0.12.2 nolearning
