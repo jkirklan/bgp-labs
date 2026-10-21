@@ -19,11 +19,6 @@ if ! podman image exists frr:latest 2>/dev/null; then
     exit 1
 fi
 
-if ! modinfo vxlan &>/dev/null 2>&1; then
-    echo "WARNING: vxlan kernel module not detected. VXLAN steps may fail."
-    echo "         On RHEL/Fedora: sudo modprobe vxlan"
-fi
-
 "${LAB_DIR}/teardown.sh" 2>/dev/null || true
 
 echo "Step 1: Creating networks ..."
@@ -55,6 +50,7 @@ podman run -d --name lab14-pe2 \
 echo "Step 3: Starting CE hosts ..."
 podman run -d --name lab14-ce-a1 \
     --cap-add NET_ADMIN \
+    --cap-add NET_RAW \
     --sysctl net.ipv4.ip_forward=1 \
     --network lab14-ce-a1-link:interface_name=eth0,ip=192.168.10.10 \
     -v "${LAB_DIR}/configs/ce-a1.conf:/etc/frr/frr.conf:ro,z" \
@@ -62,6 +58,7 @@ podman run -d --name lab14-ce-a1 \
 
 podman run -d --name lab14-ce-a2 \
     --cap-add NET_ADMIN \
+    --cap-add NET_RAW \
     --sysctl net.ipv4.ip_forward=1 \
     --network lab14-ce-a2-link:interface_name=eth0,ip=192.168.20.10 \
     -v "${LAB_DIR}/configs/ce-a2.conf:/etc/frr/frr.conf:ro,z" \
@@ -69,6 +66,7 @@ podman run -d --name lab14-ce-a2 \
 
 podman run -d --name lab14-ce-b1 \
     --cap-add NET_ADMIN \
+    --cap-add NET_RAW \
     --sysctl net.ipv4.ip_forward=1 \
     --network lab14-ce-b1-link:interface_name=eth0,ip=192.168.30.10 \
     -v "${LAB_DIR}/configs/ce-b1.conf:/etc/frr/frr.conf:ro,z" \
@@ -76,6 +74,7 @@ podman run -d --name lab14-ce-b1 \
 
 podman run -d --name lab14-ce-b2 \
     --cap-add NET_ADMIN \
+    --cap-add NET_RAW \
     --sysctl net.ipv4.ip_forward=1 \
     --network lab14-ce-b2-link:interface_name=eth0,ip=192.168.40.10 \
     -v "${LAB_DIR}/configs/ce-b2.conf:/etc/frr/frr.conf:ro,z" \
