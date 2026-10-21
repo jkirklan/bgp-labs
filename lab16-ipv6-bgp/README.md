@@ -29,7 +29,7 @@
 ```mermaid
 graph LR
     A["AS65001<br>lab16-router-a<br>eth0: 10.0.12.1/30<br>eth0: 2001:db8:12::1/64<br>announces 2001:db8:1::/48"]
-    B["AS65002<br>lab16-router-b<br>eth0: 10.0.12.2 / 2001:db8:12::2<br>eth1: 10.0.23.1 / 2001:db8:23::1<br>IPv6 transit"]
+    B["AS65002<br>lab16-router-b<br>eth0: 10.0.12.2 / 2001:db8:12::2<br>eth1: 10.0.23.1 / 2001:db8:23::1<br>IPv6 transit<br>announces 2001:db8:12::/64, 2001:db8:23::/64"]
     C["AS65003<br>lab16-router-c<br>eth0: 10.0.23.2/30<br>eth0: 2001:db8:23::2/64<br>announces 2001:db8:3::/48"]
 
     A <-->|"eBGP (IPv6)<br>2001:db8:12::/64"| B
@@ -55,9 +55,10 @@ Wait 8 seconds after startup — IPv6 address assignment and neighbor discovery 
 podman exec lab16-router-a vtysh -c "show bgp ipv6 unicast"
 ```
 
-You will see two entries:
+You will see four entries:
 - `2001:db8:1::/48` — locally originated (marked with `>*` and next-hop `::`)
 - `2001:db8:3::/48` — learned from router-b (next-hop `2001:db8:12::2`)
+- `2001:db8:12::/64` and `2001:db8:23::/64` — router-b's two link prefixes, which it announces so the far side of each link is reachable. router-a also has `2001:db8:12::/64` as a connected route, which wins over the BGP copy in the kernel routing table.
 
 Compare to the IPv4 table — it is empty because no IPv4 prefixes are being announced:
 ```bash
@@ -111,7 +112,7 @@ podman exec lab16-router-a ping -6 -c 3 2001:db8:23::2
 podman exec lab16-router-a ping -6 -c 3 2001:db8:3::1
 ```
 
-The first two pings succeed (real interfaces exist at those addresses). The third illustrates that having a BGP route for a prefix does not mean every address in it has a live host — the route just enables the path.
+The first two pings succeed: real interfaces exist at those addresses, and router-b announces `2001:db8:23::/64`, so router-a has a route to that link (and router-c has a route back via `2001:db8:12::/64`). Without those `network` statements on router-b, both pings would fail even though the BGP sessions are up. The third illustrates that having a BGP route for a prefix does not mean every address in it has a live host — the route just enables the path.
 
 ### Exercise 4 — Add a more-specific prefix
 
