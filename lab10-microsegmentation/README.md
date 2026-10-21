@@ -106,7 +106,7 @@ podman exec -it lab10-vtep-a ip route show
 # Expected: BOTH 192.168.10.0/24 (vxlan0) AND 192.168.20.0/24 (vxlan1) are present
 ```
 
-The ping from vxlan0 to 192.168.20.x fails because vtep-a routes 192.168.20.0/24 out vxlan1 (not vxlan0). VNI 1001's VTEP at 10.0.12.2 does not bridge into VNI 1002. VNI isolation is working at L2.
+The ping from vxlan0 to 192.168.20.x fails because vtep-a routes 192.168.20.0/24 out vxlan1 (not vxlan0). VNI 1001's VTEP at 10.0.12.2 does not bridge into VNI 1002. VNI isolation is working at L2. (`setup.sh` starts the VTEPs with `net.ipv4.conf.all.arp_ignore=1`, so a VTEP only answers ARP for addresses on the interface the request arrived on. With Linux's default of `0`, vtep-a would answer an ARP request on `vxlan0` for its Tenant B address, and on some kernels this ping would succeed.)
 
 ### Part 2 — The routing table leak problem
 

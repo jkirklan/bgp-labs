@@ -28,6 +28,7 @@ echo "Step 2: Starting VTEP routers ..."
 podman run -d --name lab10-vtep-a \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
   --sysctl net.ipv4.ip_forward=1 \
+  --sysctl net.ipv4.conf.all.arp_ignore=1 \
     --network lab10-underlay:interface_name=eth0,ip=10.0.12.1 \
     -v "${LAB_DIR}/configs/vtep-a.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest
@@ -35,6 +36,7 @@ podman run -d --name lab10-vtep-a \
 podman run -d --name lab10-vtep-b \
     --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SYS_ADMIN \
   --sysctl net.ipv4.ip_forward=1 \
+  --sysctl net.ipv4.conf.all.arp_ignore=1 \
     --network lab10-underlay:interface_name=eth0,ip=10.0.12.2 \
     -v "${LAB_DIR}/configs/vtep-b.conf:/etc/frr/frr.conf:ro,z" \
     frr:latest

@@ -6,8 +6,9 @@ source "${SMOKE_LIB}"
 
 echo "=== Lab 10 Smoke Test ==="
 
-if ! modinfo vxlan &>/dev/null 2>&1; then
-  echo "  SKIP: vxlan kernel module not available on this host"
+# Check inside the container: on macOS the host has no modinfo, but the Podman VM may have VXLAN.
+if ! podman exec lab10-vtep-a ip link show vxlan0 &>/dev/null; then
+  echo "  SKIP: vxlan0 was not created (vxlan kernel module not loaded on the container host?)"
   exit 0
 fi
 
