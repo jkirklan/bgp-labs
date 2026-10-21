@@ -4,10 +4,10 @@
 # Usage:
 #   Lima VM:  limactl shell <vm> -- bash /path/to/smoke-all.sh
 #   CI:       REPO_ROOT=$GITHUB_WORKSPACE bash tests/integration/smoke-all.sh
-#   Local:    bash tests/integration/smoke-all.sh   (or labs/tests/... from the know repo)
+#   Local:    bash tests/integration/smoke-all.sh
 #
 # Individual labs can be run in isolation:
-#   bash labs/lab03-hello-bgp/smoke.sh   (after running setup.sh)
+#   bash lab03-hello-bgp/smoke.sh   (after running setup.sh)
 set -uo pipefail
 
 TOTAL_PASS=0
