@@ -19,14 +19,22 @@
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab11-router-a<br>eth0: 10.0.12.1<br>eth1: 192.168.1.1<br>announces 192.168.1.0/24"]
-    B1["AS65002<br>lab11-router-b1<br>eth0: 10.0.12.2<br>eth1: 10.0.22.1"]
-    B2["AS65002<br>lab11-router-b2<br>eth0: 10.0.22.2<br>eth1: 10.0.23.1"]
-    C["AS65003<br>lab11-router-c<br>eth0: 10.0.23.2<br>eth1: 192.168.3.1<br>announces 192.168.3.0/24"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
 
-    A <-->|"eBGP 10.0.12.0/30"| B1
-    B1 <-->|"iBGP 10.0.22.0/30<br>(you add this)"| B2
-    B2 <-->|"eBGP 10.0.23.0/30"| C
+    A["AS65001\nlab11-router-a\n10.0.12.1\nannounces 192.168.1.0/24"]
+    B1["AS65002\nlab11-router-b1\n10.0.12.2 / 10.0.22.1"]
+    B2["AS65002\nlab11-router-b2\n10.0.22.2 / 10.0.23.1"]
+    C["AS65003\nlab11-router-c\n10.0.23.2\nannounces 192.168.3.0/24"]
+
+    A   <-->|"eBGP 10.0.12.0/30"| B1
+    B1  <-.->|"iBGP 10.0.22.0/30 (you add this)"| B2
+    B2  <-->|"eBGP 10.0.23.0/30"| C
+
+    class A as1
+    class B1,B2 as2
+    class C as3
 ```
 
 - **router-a** (AS65001): announces `192.168.1.0/24` via eBGP to router-b1
