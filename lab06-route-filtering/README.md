@@ -38,8 +38,20 @@ This asks the peer to resend its UPDATE messages without dropping the session.
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab06-router-a<br>advertises 3 prefixes"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab06-router-b<br>(ISP, filters inbound)"]
-    B  <-->|"10.0.23.0/30"| C["AS65003<br>lab06-router-c"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+
+    A["AS65001\nlab06-router-a\nadvertises 3 prefixes"]
+    B["AS65002\nlab06-router-b\nISP — filters inbound"]
+    C["AS65003\nlab06-router-c"]
+
+    A <-->|"eBGP 10.0.12.0/30"| B
+    B <-->|"eBGP 10.0.23.0/30"| C
+
+    class A as1
+    class B as2
+    class C as3
 ```
 
 router-a and router-c are pre-configured. router-b has TODO gaps for you to fill in.

@@ -32,8 +32,16 @@ outer IP from 10.0.12.1 to 10.0.12.2 → UDP port 4789 → VNI 1001 → inner IP
 
 ```mermaid
 graph LR
-    A["AS65001 lab09-vtep-a<br>underlay: 10.0.12.1<br>overlay: 192.168.10.1"]
-    <-->|"lab09-underlay 10.0.12.0/30<br>VXLAN VNI 1001 (UDP/4789)"| B["AS65002 lab09-vtep-b<br>underlay: 10.0.12.2<br>overlay: 192.168.10.2"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+
+    A["AS65001\nlab09-vtep-a\nunderlay: 10.0.12.1\noverlay: 192.168.10.1"]
+    B["AS65002\nlab09-vtep-b\nunderlay: 10.0.12.2\noverlay: 192.168.10.2"]
+
+    A <-->|"eBGP 10.0.12.0/30\nVXLAN VNI 1001 (UDP/4789)"| B
+
+    class A as1
+    class B as2
 ```
 
 Both VTEPs are fully pre-configured. This lab focuses on observation.

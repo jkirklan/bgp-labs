@@ -28,12 +28,20 @@
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab16-router-a<br>eth0: 10.0.12.1/30<br>eth0: 2001:db8:12::1/64<br>announces 2001:db8:1::/48"]
-    B["AS65002<br>lab16-router-b<br>eth0: 10.0.12.2 / 2001:db8:12::2<br>eth1: 10.0.23.1 / 2001:db8:23::1<br>IPv6 transit<br>announces 2001:db8:12::/64, 2001:db8:23::/64"]
-    C["AS65003<br>lab16-router-c<br>eth0: 10.0.23.2/30<br>eth0: 2001:db8:23::2/64<br>announces 2001:db8:3::/48"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
 
-    A <-->|"eBGP (IPv6)<br>2001:db8:12::/64"| B
-    B <-->|"eBGP (IPv6)<br>2001:db8:23::/64"| C
+    A["AS65001\nlab16-router-a\n10.0.12.1 / 2001:db8:12::1\nannounces 2001:db8:1::/48"]
+    B["AS65002\nlab16-router-b\n10.0.12.2 / 2001:db8:12::2\nIPv6 transit"]
+    C["AS65003\nlab16-router-c\n10.0.23.2 / 2001:db8:23::2\nannounces 2001:db8:3::/48"]
+
+    A <-->|"eBGP (IPv6)\n2001:db8:12::/64"| B
+    B <-->|"eBGP (IPv6)\n2001:db8:23::/64"| C
+
+    class A as1
+    class B as2
+    class C as3
 ```
 
 Each link has both an IPv4 address (assigned by Podman) and an IPv6 address (configured by FRR). The BGP sessions peer over the IPv6 global addresses.

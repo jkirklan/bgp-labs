@@ -51,10 +51,25 @@ and LOCAL_PREF (Exercise 3).
 
 ```mermaid
 graph TD
-    A["AS65001<br>lab05-router-a<br>192.168.1.0/24"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab05-router-b"]
-    A  <-->|"10.0.13.0/30"| C["AS65003<br>lab05-router-c"]
-    B  <-->|"10.0.24.0/30"| D["AS65004<br>lab05-router-d"]
-    C  <-->|"10.0.34.0/30"| D
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+    classDef as4 fill:#8e44ad,color:#fff,stroke:#6c3483
+
+    A["AS65001\nlab05-router-a\nannounces 192.168.1.0/24"]
+    B["AS65002\nlab05-router-b"]
+    C["AS65003\nlab05-router-c"]
+    D["AS65004\nlab05-router-d"]
+
+    A <-->|"eBGP 10.0.12.0/30"| B
+    A <-->|"eBGP 10.0.13.0/30"| C
+    B <-->|"eBGP 10.0.24.0/30"| D
+    C <-->|"eBGP 10.0.34.0/30"| D
+
+    class A as1
+    class B as2
+    class C as3
+    class D as4
 ```
 
 All four routers are pre-configured. All sessions come up immediately on `./setup.sh`. The lab is about path selection policy — session setup was covered in Lab 03.

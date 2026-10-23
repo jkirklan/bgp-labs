@@ -40,8 +40,20 @@ BFD (Bidirectional Forwarding Detection) can detect failures in sub-second time.
 
 ```mermaid
 graph LR
-    C["AS65001<br>lab08-customer<br>192.168.100.1/24"]  <-->|"10.0.12.0/30<br>(primary)"| P["AS65002<br>lab08-isp-primary"]
-    C  <-->|"10.0.13.0/30<br>(backup)"| B["AS65003<br>lab08-isp-backup"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+
+    C["AS65001\nlab08-customer\n192.168.100.0/24"]
+    P["AS65002\nlab08-isp-primary"]
+    B["AS65003\nlab08-isp-backup"]
+
+    C <-->|"eBGP 10.0.12.0/30 (primary)"| P
+    C <-->|"eBGP 10.0.13.0/30 (backup)"| B
+
+    class C as1
+    class P as2
+    class B as3
 ```
 
 All three routers are pre-configured. The failover policy (LOCAL_PREF) is

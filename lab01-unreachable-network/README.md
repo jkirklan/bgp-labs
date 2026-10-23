@@ -160,8 +160,16 @@ you need a routing *protocol* — which is what BGP is.
 
 ```mermaid
 graph LR
-    A["lab01-host-a<br>192.168.101.10/24"] <-->|"lab01-net-a<br>192.168.101.0/24"| R["lab01-router-a<br>192.168.101.254 | 192.168.102.254"]
-    R <-->|"lab01-net-b<br>192.168.102.0/24"| B["lab01-host-b<br>192.168.102.10/24"]
+    classDef host fill:#95a5a6,color:#fff,stroke:#707b7c
+
+    A["lab01-host-a\n192.168.101.10/24"]
+    R["lab01-router-a\n192.168.101.254\n192.168.102.254"]
+    B["lab01-host-b\n192.168.102.10/24"]
+
+    A <-->|"lab01-net-a\n192.168.101.0/24"| R
+    R <-->|"lab01-net-b\n192.168.102.0/24"| B
+
+    class A,B host
 ```
 
 All three containers run FRR. lab01-host-a and lab01-host-b act as end hosts;

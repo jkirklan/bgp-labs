@@ -77,7 +77,16 @@ specified in `remote-as`.
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab03-router-a<br>192.168.1.0/24"] <-->|"10.0.12.0/30<br>lab03-as1-as2-link"| B["AS65002<br>lab03-router-b<br>192.168.2.0/24"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+
+    A["AS65001\nlab03-router-a\nannounces 192.168.1.0/24"]
+    B["AS65002\nlab03-router-b\nannounces 192.168.2.0/24"]
+
+    A <-->|"eBGP 10.0.12.0/30"| B
+
+    class A as1
+    class B as2
 ```
 
 lab03-router-a is pre-configured. lab03-router-b has TODO gaps for you to fill in.

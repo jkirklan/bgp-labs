@@ -45,8 +45,16 @@ VNI 1002 (Tenant B — 192.168.20.0/24):
 
 ```mermaid
 graph LR
-    A["AS65001 lab10-vtep-a<br>underlay: 10.0.12.1"]
-    <-->|"lab10-underlay 10.0.12.0/30<br>eBGP"| B["AS65002 lab10-vtep-b<br>underlay: 10.0.12.2"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+
+    A["AS65001\nlab10-vtep-a\nunderlay: 10.0.12.1"]
+    B["AS65002\nlab10-vtep-b\nunderlay: 10.0.12.2"]
+
+    A <-->|"eBGP 10.0.12.0/30"| B
+
+    class A as1
+    class B as2
 ```
 
 **Overlay — two isolated VXLAN segments**

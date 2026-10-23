@@ -52,7 +52,14 @@ vlan10 hosts; its eth1 is the gateway for vlan20 hosts.
 
 ```mermaid
 graph LR
-    A1["lab02-host-a1<br>192.168.10.10/24"] <-->|"lab02-vlan10<br>192.168.10.0/24"| A2["lab02-host-a2<br>192.168.10.11/24"]
+    classDef host fill:#95a5a6,color:#fff,stroke:#707b7c
+
+    A1["lab02-host-a1\n192.168.10.10/24"]
+    A2["lab02-host-a2\n192.168.10.11/24"]
+
+    A1 <-->|"lab02-vlan10\n192.168.10.0/24"| A2
+
+    class A1,A2 host
 ```
 
 Both hosts share one Podman network. ARP resolves directly — no router involved.
@@ -63,9 +70,18 @@ Both hosts share one Podman network. ARP resolves directly — no router involve
 
 ```mermaid
 graph LR
-    A1["lab02-host-a1<br>192.168.10.10/24<br>(eth0 only)"] <-->|"lab02-vlan10<br>192.168.10.0/24"| RA["lab02-router-a<br>eth0: 192.168.10.254<br>eth1: 192.168.20.254"]
-    A2["lab02-host-a2<br>192.168.10.11/24<br>(eth0 only)"] <-->|"lab02-vlan10"| RA
-    RA <-->|"lab02-vlan20<br>192.168.20.0/24"| B1["lab02-host-b1<br>192.168.20.10/24<br>(eth0 only)"]
+    classDef host fill:#95a5a6,color:#fff,stroke:#707b7c
+
+    A1["lab02-host-a1\n192.168.10.10/24"]
+    A2["lab02-host-a2\n192.168.10.11/24"]
+    RA["lab02-router-a\neth0: 192.168.10.254\neth1: 192.168.20.254"]
+    B1["lab02-host-b1\n192.168.20.10/24"]
+
+    A1 <-->|"lab02-vlan10\n192.168.10.0/24"| RA
+    A2 <-->|"lab02-vlan10"| RA
+    RA <-->|"lab02-vlan20\n192.168.20.0/24"| B1
+
+    class A1,A2,B1 host
 ```
 
 ## Setup

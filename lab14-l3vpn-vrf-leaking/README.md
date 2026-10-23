@@ -32,16 +32,26 @@ EVPN type-5 (IP Prefix) routes carry VRF prefixes across VTEPs. "Symmetric IRB" 
 
 ```mermaid
 graph LR
-  CEA1["CE-A1<br/>192.168.10.10<br/>(Tenant A)"] --- PE1
-  CEB1["CE-B1<br/>192.168.30.10<br/>(Tenant B)"] --- PE1
+    classDef as1  fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2  fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef host fill:#95a5a6,color:#fff,stroke:#707b7c
 
-  PE1["PE1 — AS 65001<br/>10.0.12.1<br/>VRF-A: 192.168.10.1<br/>VRF-B: 192.168.30.1"] <-->|"eBGP + EVPN<br/>10.0.12.0/30<br/>L3VNI 100, 200"| PE2
+    CEA1["CE-A1\n192.168.10.10\nTenant A"]
+    CEB1["CE-B1\n192.168.30.10\nTenant B"]
+    PE1["AS65001\nPE1\n10.0.12.1\nVRF-A: 192.168.10.1\nVRF-B: 192.168.30.1"]
+    PE2["AS65002\nPE2\n10.0.12.2\nVRF-A: 192.168.20.1\nVRF-B: 192.168.40.1"]
+    CEA2["CE-A2\n192.168.20.10\nTenant A"]
+    CEB2["CE-B2\n192.168.40.10\nTenant B"]
 
-  PE2["PE2 — AS 65002<br/>10.0.12.2<br/>VRF-A: 192.168.20.1<br/>VRF-B: 192.168.40.1"] --- CEA2
-  PE2 --- CEB2
+    CEA1 --- PE1
+    CEB1 --- PE1
+    PE1  <-->|"eBGP + EVPN\n10.0.12.0/30\nL3VNI 100, 200"| PE2
+    PE2  --- CEA2
+    PE2  --- CEB2
 
-  CEA2["CE-A2<br/>192.168.20.10<br/>(Tenant A)"]
-  CEB2["CE-B2<br/>192.168.40.10<br/>(Tenant B)"]
+    class PE1 as1
+    class PE2 as2
+    class CEA1,CEB1,CEA2,CEB2 host
 ```
 
 | Container | Role | IP(s) |

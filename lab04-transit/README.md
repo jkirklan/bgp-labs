@@ -46,8 +46,20 @@ requirements, and route reflectors.
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab04-router-a<br>192.168.1.0/24"]  <-->|"10.0.12.0/30"| B["AS65002<br>lab04-router-b<br>(transit)"]
-    B  <-->|"10.0.23.0/30"| C["AS65003<br>lab04-router-c<br>192.168.3.0/24"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+
+    A["AS65001\nlab04-router-a\nannounces 192.168.1.0/24"]
+    B["AS65002\nlab04-router-b\ntransit"]
+    C["AS65003\nlab04-router-c\nannounces 192.168.3.0/24"]
+
+    A <-->|"eBGP 10.0.12.0/30"| B
+    B <-->|"eBGP 10.0.23.0/30"| C
+
+    class A as1
+    class B as2
+    class C as3
 ```
 
 **What's pre-configured vs. what you build:**

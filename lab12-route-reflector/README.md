@@ -32,18 +32,28 @@ Without the RR, b3 would learn nothing. With the RR, b3 peers with router-rr and
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab12-router-a<br>eth0: 10.0.12.1<br>eth1: 192.168.1.1<br>announces 192.168.1.0/24"]
-    B1["AS65002<br>lab12-router-b1<br>eth0: 10.0.12.2<br>eth1: 10.0.20.2<br>RR client"]
-    RR["AS65002<br>lab12-router-rr<br>eth0: 10.0.20.1<br>Route Reflector"]
-    B2["AS65002<br>lab12-router-b2<br>eth0: 10.0.20.3<br>eth1: 10.0.23.1<br>RR client"]
-    B3["AS65002<br>lab12-router-b3<br>eth0: 10.0.20.4<br>RR client (internal only)"]
-    C["AS65003<br>lab12-router-c<br>eth0: 10.0.23.2<br>eth1: 192.168.3.1<br>announces 192.168.3.0/24"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+    classDef rr  fill:#f39c12,color:#000,stroke:#b7770d,stroke-width:3px
 
-    A <-->|"eBGP 10.0.12.0/30"| B1
-    B1 <-->|"iBGP 10.0.20.0/24<br>(you add this)"| RR
-    B2 <-->|"iBGP 10.0.20.0/24<br>(you add this)"| RR
-    B3 <-->|"iBGP 10.0.20.0/24<br>(you add this)"| RR
+    A["AS65001\nlab12-router-a\n10.0.12.1\nannounces 192.168.1.0/24"]
+    B1["AS65002\nlab12-router-b1\n10.0.12.2 / 10.0.20.2\nRR client"]
+    RR(["AS65002\nlab12-router-rr\n10.0.20.1\nRoute Reflector"])
+    B2["AS65002\nlab12-router-b2\n10.0.20.3 / 10.0.23.1\nRR client"]
+    B3["AS65002\nlab12-router-b3\n10.0.20.4\nRR client (internal only)"]
+    C["AS65003\nlab12-router-c\n10.0.23.2\nannounces 192.168.3.0/24"]
+
+    A  <-->|"eBGP 10.0.12.0/30"| B1
+    B1 <-.->|"iBGP 10.0.20.0/24 (you add this)"| RR
+    B2 <-.->|"iBGP 10.0.20.0/24 (you add this)"| RR
+    B3 <-.->|"iBGP 10.0.20.0/24 (you add this)"| RR
     B2 <-->|"eBGP 10.0.23.0/30"| C
+
+    class A as1
+    class B1,B2,B3 as2
+    class C as3
+    class RR rr
 ```
 
 All AS65002 routers share the `lab12-as2-core` network (`10.0.20.0/24`) and can reach each other directly — no dedicated point-to-point links needed for iBGP.

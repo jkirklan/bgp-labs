@@ -33,9 +33,24 @@ This is the fundamental "customer vs. peer" model used by every ISP.
 
 ```mermaid
 graph LR
-    CA["AS65001<br>lab07-cust-a<br>172.16.1.0/24"]  <-->|"10.0.10.0/30"| T["AS65000<br>lab07-transit"]
-    CB["AS65002<br>lab07-cust-b<br>172.16.2.0/24"]  <-->|"10.0.20.0/30"| T
-    T  <-->|"10.0.30.0/30"| P["AS65003<br>lab07-peer<br>172.16.3.0/24"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+    classDef as4 fill:#8e44ad,color:#fff,stroke:#6c3483
+
+    T["AS65000\nlab07-transit"]
+    CA["AS65001\nlab07-cust-a\n172.16.1.0/24"]
+    CB["AS65002\nlab07-cust-b\n172.16.2.0/24"]
+    P["AS65003\nlab07-peer\n172.16.3.0/24"]
+
+    CA <-->|"eBGP 10.0.10.0/30"| T
+    CB <-->|"eBGP 10.0.20.0/30"| T
+    T  <-->|"eBGP 10.0.30.0/30"| P
+
+    class T as1
+    class CA as2
+    class CB as3
+    class P as4
 ```
 
 lab07-transit has TODO gaps (route-maps, community-lists). All others pre-configured.

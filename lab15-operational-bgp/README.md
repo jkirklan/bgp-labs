@@ -39,12 +39,20 @@ In this lab, `203.0.113.0/24` is used as the **legitimate** prefix from router-b
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab15-router-a<br>eth0: 10.0.12.1<br>eth1: 10.0.13.1<br>router to harden"]
-    B["AS65002<br>lab15-router-b<br>eth0: 10.0.12.2<br>good provider<br>announces 203.0.113.0/24"]
-    C["AS65003<br>lab15-router-c<br>eth0: 10.0.13.2<br>misconfigured peer<br>announces RFC 1918 bogons"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+
+    A["AS65001\nlab15-router-a\n10.0.12.1 / 10.0.13.1\nrouter to harden"]
+    B["AS65002\nlab15-router-b\n10.0.12.2\ngood provider\nannounces 203.0.113.0/24"]
+    C["AS65003\nlab15-router-c\n10.0.13.2\nmisconfigured peer\nannounces RFC 1918 bogons"]
 
     A <-->|"eBGP 10.0.12.0/30"| B
     A <-->|"eBGP 10.0.13.0/30"| C
+
+    class A as1
+    class B as2
+    class C as3
 ```
 
 ## Setup

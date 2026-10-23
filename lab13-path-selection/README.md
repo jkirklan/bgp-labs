@@ -36,15 +36,25 @@ When a BGP router has multiple paths to the same prefix, it runs them through a 
 
 ```mermaid
 graph LR
-    A["AS65001<br>lab13-router-a<br>eth0: 10.0.12.1<br>eth1: 10.0.13.1<br>dual-homed customer"]
-    B["AS65002<br>lab13-router-b<br>eth0: 10.0.12.2<br>eth1: 10.0.24.1<br>provider 1"]
-    C["AS65003<br>lab13-router-c<br>eth0: 10.0.13.2<br>eth1: 10.0.34.1<br>provider 2"]
-    D["AS65004<br>lab13-router-d<br>eth0: 10.0.24.2<br>eth1: 10.0.34.2<br>eth2: 192.168.4.1<br>announces 192.168.4.0/24"]
+    classDef as1 fill:#4a90d9,color:#fff,stroke:#2c6fad
+    classDef as2 fill:#e67e22,color:#fff,stroke:#a85a17
+    classDef as3 fill:#27ae60,color:#fff,stroke:#1a7a40
+    classDef as4 fill:#8e44ad,color:#fff,stroke:#6c3483
+
+    A["AS65001\nlab13-router-a\n10.0.12.1 / 10.0.13.1\ndual-homed customer"]
+    B["AS65002\nlab13-router-b\n10.0.12.2 / 10.0.24.1\nprovider 1"]
+    C["AS65003\nlab13-router-c\n10.0.13.2 / 10.0.34.1\nprovider 2"]
+    D["AS65004\nlab13-router-d\n10.0.24.2 / 10.0.34.2\nannounces 192.168.4.0/24"]
 
     A <-->|"eBGP 10.0.12.0/30"| B
     A <-->|"eBGP 10.0.13.0/30"| C
     B <-->|"eBGP 10.0.24.0/30"| D
     C <-->|"eBGP 10.0.34.0/30"| D
+
+    class A as1
+    class B as2
+    class C as3
+    class D as4
 ```
 
 All sessions are pre-configured. router-a receives `192.168.4.0/24` via two independent paths:
