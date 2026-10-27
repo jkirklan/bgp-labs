@@ -202,7 +202,7 @@ Available helpers in `tests/integration/smoke-lib.sh`:
 | Helper | Purpose |
 |--------|---------|
 | `assert_containers_running <prefix>` | All containers with prefix are running |
-| `assert_bgp_established <ctr> <min_count> [label]` | ≥N IPv4 BGP sessions Established (waits up to 30s) |
+| `assert_bgp_established <ctr> <min_count> [label]` | ≥N IPv4 BGP sessions Established (waits up to 60s) |
 | `assert_bgp6_established <ctr> <min_count> [label]` | ≥N IPv6 BGP sessions Established |
 | `assert_route_present <ctr> <prefix> [label]` | Prefix in IPv4 BGP table |
 | `assert_ipv6_route_present <ctr> <prefix> [label]` | Prefix in IPv6 BGP table |
