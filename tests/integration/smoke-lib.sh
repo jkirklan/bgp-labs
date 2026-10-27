@@ -64,11 +64,12 @@ wait_bgp_established() {
 }
 
 # Assert at least <min_count> BGP sessions are Established on <container>.
+# 60s: on the macOS podman machine sessions can take just over 30s to come up.
 assert_bgp_established() {
   local container="$1"
   local min_count="${2:-1}"
   local label="${3:-$container}"
-  if wait_bgp_established "$container" "$min_count" 30; then
+  if wait_bgp_established "$container" "$min_count" 60; then
     local count
     count=$(bgp_established_count "$container")
     pass "${label}: ${count} BGP session(s) Established (expected ≥${min_count})"
